@@ -19,28 +19,38 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.transport.TTransport;
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 /**
  * Dispatch TNiftyTransport to the TProcessor and write output back.
+ *
+ * Note that all current async thrift clients are capable of sending multiple requests at once
+ * but not capable of handling out-of-order responses to those requests, so this dispatcher
+ * sends the requests in order. (Eventually this will be conditional on a flag in the thrift
+ * message header for future async clients that can handle out-of-order responses).
  */
 public class NiftyDispatcher extends SimpleChannelUpstreamHandler
 {
-
     private static final Logger log = LoggerFactory.getLogger(NiftyDispatcher.class);
 
     private final TProcessorFactory processorFactory;
     private final TProtocolFactory inProtocolFactory;
     private final TProtocolFactory outProtocolFactory;
     private final Executor exe;
+    private int dispatcherSequenceId = 0;
+    private int lastResponseWrittenId = 0;
+    private final Map<Integer, ChannelBuffer> responseMap = new HashMap<>();
 
     public NiftyDispatcher(ThriftServerDef def)
     {
@@ -51,34 +61,61 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
     }
 
     @Override
-    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e)
+    public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e)
             throws Exception
     {
-        if (e.getMessage() instanceof TTransport) {
-            exe.execute(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    TTransport t = (TTransport) e.getMessage();
-                    TProtocol inProtocol = inProtocolFactory.getProtocol(t);
-                    TProtocol outProtocol = outProtocolFactory.getProtocol(t);
-                    try {
-                        processorFactory.getProcessor(t).process(
-                                inProtocol,
-                                outProtocol
-                        );
-                    }
-                    catch (TException e1) {
-                        log.error("Exception while invoking!", e1);
-                        closeChannel(ctx);
-                    }
-                }
-            });
+        if (e.getMessage() instanceof TNiftyTransport) {
+            TNiftyTransport messageTransport = (TNiftyTransport) e.getMessage();
+            processRequest(ctx, messageTransport);
         }
         else {
             ctx.sendUpstream(e);
         }
+    }
+
+    private void processRequest(final ChannelHandlerContext ctx, final TNiftyTransport messageTransport) {
+        // Remember the ordering of requests as they arrive, used to enforce an order on the
+        // responses.
+        final int responseSequenceId = ++dispatcherSequenceId;
+        exe.execute(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                TProtocol inProtocol = inProtocolFactory.getProtocol(messageTransport);
+                TProtocol outProtocol = outProtocolFactory.getProtocol(messageTransport);
+                try {
+                    processorFactory.getProcessor(messageTransport).process(
+                            inProtocol,
+                            outProtocol
+                    );
+                    // Ensure responses to requests are written in the same order the requests
+                    // were received.
+                    synchronized (responseMap) {
+                        ChannelBuffer response = messageTransport.getOutputBuffer();
+                        int currentResponseId = lastResponseWrittenId + 1;
+                        if (responseSequenceId != currentResponseId) {
+                            // This response is NOT next in line of ordered responses, save it to
+                            // be sent later, after responses to all earlier requests have been
+                            // sent.
+                            responseMap.put(responseSequenceId, response);
+                        } else {
+                            // This response was next in line, write this response now, and see if
+                            // there are others next in line that should be sent now as well.
+                            do {
+                                Channels.write(ctx.getChannel(), response);
+                                ++lastResponseWrittenId;
+                                ++currentResponseId;
+                            } while (null != (response = responseMap.remove(currentResponseId)));
+                        }
+                    }
+                }
+                catch (TException e1) {
+                    log.error("Exception while invoking!", e1);
+                    closeChannel(ctx);
+                }
+            }
+        });
     }
 
     @Override
