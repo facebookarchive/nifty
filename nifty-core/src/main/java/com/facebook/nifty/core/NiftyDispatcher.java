@@ -19,7 +19,9 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
+import org.apache.thrift.transport.TTransport;
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -128,12 +130,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                         } else {
                             // This response was next in line, write this response now, and see if
                             // there are others next in line that should be sent now as well.
-                            do {
-                                Channels.write(ctx.getChannel(), response);
-                                lastResponseWrittenId.incrementAndGet();
-                                ++currentResponseId;
-                                response = responseMap.remove(currentResponseId);
-                            } while (null != response);
+                            writeResponse(ctx, response, messageTransport.getTransportType());
                         }
                     }
                 }
@@ -142,7 +139,48 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                     closeChannel(ctx);
                 }
             }
+
+            private void writeResponse(final ChannelHandlerContext ctx,
+                                       final ChannelBuffer outputBuffer,
+                                       final ThriftTransportType transportType) {
+                // Ensure responses to requests are written in the same order the requests
+                // were received.
+                synchronized (responseMap) {
+                    ChannelBuffer response = outputBuffer;
+                    int currentResponseId = lastResponseWrittenId.get() + 1;
+                    if (responseSequenceId != currentResponseId) {
+                        // This response is NOT next in line of ordered responses, save it to
+                        // be sent later, after responses to all earlier requests have been
+                        // sent.
+                        responseMap.put(responseSequenceId, response);
+                    } else {
+                        // This response was next in line, write this response now, and see if
+                        // there are others next in line that should be sent now as well.
+                        do {
+                            response = addFraming(response, transportType);
+                            Channels.write(ctx.getChannel(), response);
+                            lastResponseWrittenId.incrementAndGet();
+                            ++currentResponseId;
+                            response = responseMap.remove(currentResponseId);
+                        } while (null != response);
+                    }
+                }
+            }
         });
+    }
+
+    private ChannelBuffer addFraming(ChannelBuffer response, ThriftTransportType transportType) {
+        if (transportType == ThriftTransportType.UNFRAMED) {
+            return response;
+        }
+        else if (transportType == ThriftTransportType.FRAMED) {
+            ChannelBuffer frameSizeBuffer = ChannelBuffers.buffer(4);
+            frameSizeBuffer.writeInt(response.readableBytes());
+            return ChannelBuffers.wrappedBuffer(frameSizeBuffer, response);
+        }
+        else {
+            throw new UnsupportedOperationException("Header protocol is not supported");
+        }
     }
 
     @Override
