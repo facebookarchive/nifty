@@ -28,20 +28,19 @@ import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
 import org.jboss.netty.handler.codec.http.HttpClientCodec;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpRequestEncoder;
 import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponseDecoder;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.Timer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @NotThreadSafe
 public class HttpClientChannel extends AbstractClientChannel {
     private final Channel underlyingNettyChannel;
     private final String hostName;
-    private Map<String, String> headerDictionary;
+    private final Map<String, String> headerMap;
     private final String endpointUri;
 
     public HttpClientChannel(Channel channel,
@@ -50,6 +49,7 @@ public class HttpClientChannel extends AbstractClientChannel {
                              String endpointUri) {
         super(channel, timer);
 
+        this.headerMap = new ConcurrentHashMap<>();
         this.underlyingNettyChannel = channel;
         this.hostName = hostName;
         this.endpointUri = endpointUri;
@@ -104,10 +104,8 @@ public class HttpClientChannel extends AbstractClientChannel {
         httpRequest.setHeader(HttpHeaders.ACCEPT, "application/x-thrift");
         httpRequest.setHeader(HttpHeaders.USER_AGENT, "Java/Swift-HttpThriftClientChannel");
 
-        if (headerDictionary != null) {
-            for (Map.Entry<String, String> entry : headerDictionary.entrySet()) {
-                httpRequest.setHeader(entry.getKey(), entry.getValue());
-            }
+        for (Map.Entry<String, String> entry : headerMap.entrySet()) {
+            httpRequest.setHeader(entry.getKey(), entry.getValue());
         }
 
         httpRequest.setContent(request);
@@ -115,9 +113,9 @@ public class HttpClientChannel extends AbstractClientChannel {
         return underlyingNettyChannel.write(httpRequest);
     }
 
-    public void setHeaders(Map<String, String> headers)
+    public Map<String, String> getHeaders()
     {
-        this.headerDictionary = headers;
+        return headerMap;
     }
 
     public static class Factory implements NiftyClientChannel.Factory<HttpClientChannel> {
