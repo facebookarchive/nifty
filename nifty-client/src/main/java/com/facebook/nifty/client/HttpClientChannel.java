@@ -123,9 +123,9 @@ public class HttpClientChannel extends AbstractClientChannel {
         private final String hostName;
         private final String endpointUri;
 
-        public Factory(String hostName, String endpointUri)
+        public Factory(String hostAndPort, String endpointUri)
         {
-            this.hostName = hostName;
+            this.hostName = hostAndPort;
             this.endpointUri = endpointUri;
         }
 
