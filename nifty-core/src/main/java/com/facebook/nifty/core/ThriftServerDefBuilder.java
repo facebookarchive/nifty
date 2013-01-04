@@ -15,6 +15,7 @@
  */
 package com.facebook.nifty.core;
 
+import io.airlift.units.Duration;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -50,7 +51,7 @@ public class ThriftServerDefBuilder
     private Executor executor;
     private String name = "nifty-" + ID.getAndIncrement();
     private boolean useHeaderTransport;
-    private int clientIdleTimeoutMillis;
+    private Duration clientIdleTimeout;
 
     /**
      * Create a ThriftServerDefBuilder with common defaults
@@ -71,7 +72,7 @@ public class ThriftServerDefBuilder
             }
         };
         this.useHeaderTransport = false;
-        this.clientIdleTimeoutMillis = 0;
+        this.clientIdleTimeout = null;
     }
 
     /**
@@ -161,9 +162,9 @@ public class ThriftServerDefBuilder
      * Specify timeout during which if connected client doesn't send a message, server
      * will disconnect the client
      */
-    public ThriftServerDefBuilder clientIdleTimeoutMillis(int clientIdleTimeoutMs)
+    public ThriftServerDefBuilder clientIdleTimeout(Duration clientIdleTimeout)
     {
-        this.clientIdleTimeoutMillis = clientIdleTimeoutMs;
+        this.clientIdleTimeout = clientIdleTimeout;
         return this;
     }
 
@@ -200,7 +201,7 @@ public class ThriftServerDefBuilder
                 processorFactory,
                 inProtocolFact,
                 outProtocolFact,
-                clientIdleTimeoutMillis,
+                clientIdleTimeout,
                 useHeaderTransport,
                 executor);
     }

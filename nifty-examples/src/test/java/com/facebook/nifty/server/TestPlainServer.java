@@ -24,6 +24,7 @@ import com.facebook.nifty.test.ResultCode;
 import com.facebook.nifty.test.scribe;
 import com.google.inject.Guice;
 import com.google.inject.Stage;
+import io.airlift.units.Duration;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TFramedTransport;
@@ -40,6 +41,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class TestPlainServer
 {
@@ -100,7 +102,7 @@ public class TestPlainServer
     public void testSpecifiedConnectionIdleTimeout()
             throws InterruptedException, TException
     {
-        startServer(getThriftServerDefBuilder().clientIdleTimeoutMillis(250));
+        startServer(getThriftServerDefBuilder().clientIdleTimeout(new Duration(250, TimeUnit.MILLISECONDS)));
         scribe.Client client = makeNiftyClient();
         Thread.sleep(500);
         client.Log(Arrays.asList(new LogEntry("hello", "world")));

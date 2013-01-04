@@ -45,7 +45,6 @@ public class NettyServerTransport
 
     private final int port;
     private final ChannelPipelineFactory pipelineFactory;
-    private static final int READER_IDLE_TIMEOUT = 0;
     private static final int NO_WRITER_IDLE_TIMEOUT = 0;
     private static final int NO_ALL_IDLE_TIMEOUT = 0;
     private ServerBootstrap bootstrap;
@@ -77,10 +76,10 @@ public class NettyServerTransport
                     cp.addLast(ChannelStatistics.NAME, new ChannelStatistics(allChannels));
                     cp.addLast("frameDecoder", new ThriftFrameDecoder(def.getMaxFrameSize(),
                                                                       def.getInProtocolFactory()));
-                    if (def.getClientIdleTimeoutMillis() > 0) {
+                    if (def.getClientIdleTimeout() != null) {
                         // Add handlers to detect idle client connections and disconnect them
                         cp.addLast("idleTimeoutHandler", new IdleStateHandler(timer,
-                                                                              def.getClientIdleTimeoutMillis(),
+                                                                              (int)def.getClientIdleTimeout().toMillis(),
                                                                               NO_WRITER_IDLE_TIMEOUT,
                                                                               NO_ALL_IDLE_TIMEOUT,
                                                                               TimeUnit.MILLISECONDS
