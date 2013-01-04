@@ -50,6 +50,7 @@ public class ThriftServerDefBuilder
     private Executor executor;
     private String name = "nifty-" + ID.getAndIncrement();
     private boolean useHeaderTransport;
+    private int clientIdleTimeoutMillis;
 
     /**
      * Create a ThriftServerDefBuilder with common defaults
@@ -70,6 +71,7 @@ public class ThriftServerDefBuilder
             }
         };
         this.useHeaderTransport = false;
+        this.clientIdleTimeoutMillis = 0;
     }
 
     /**
@@ -156,6 +158,16 @@ public class ThriftServerDefBuilder
     }
 
     /**
+     * Specify timeout during which if connected client doesn't send a message, server
+     * will disconnect the client
+     */
+    public ThriftServerDefBuilder clientIdleTimeoutMillis(int clientIdleTimeoutMs)
+    {
+        this.clientIdleTimeoutMillis = clientIdleTimeoutMs;
+        return this;
+    }
+
+    /**
      * Specify an executor for thrift processor invocations ( i.e. = THaHsServer )
      * By default invocation happens in Netty single thread
      * ( i.e. = TNonBlockingServer )
@@ -188,6 +200,7 @@ public class ThriftServerDefBuilder
                 processorFactory,
                 inProtocolFact,
                 outProtocolFact,
+                clientIdleTimeoutMillis,
                 useHeaderTransport,
                 executor);
     }

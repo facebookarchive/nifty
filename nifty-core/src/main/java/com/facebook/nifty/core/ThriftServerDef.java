@@ -31,10 +31,12 @@ public class ThriftServerDef
     private final TProcessorFactory processorFactory;
     private final TProtocolFactory inProtocolFact;
     private final TProtocolFactory outProtocolFact;
+
+    private final int clientIdleTimeoutMillis;
+
     private final boolean headerTransport;
     private final Executor executor;
     private final String name;
-
     public ThriftServerDef(
             String name,
             int serverPort,
@@ -43,6 +45,7 @@ public class ThriftServerDef
             TProcessorFactory factory,
             TProtocolFactory inProtocolFact,
             TProtocolFactory outProtocolFact,
+            int clientIdleTimeoutMillis,
             boolean useHeaderTransport,
             Executor executor)
     {
@@ -53,6 +56,7 @@ public class ThriftServerDef
         this.processorFactory = factory;
         this.inProtocolFact = inProtocolFact;
         this.outProtocolFact = outProtocolFact;
+        this.clientIdleTimeoutMillis = clientIdleTimeoutMillis;
         this.headerTransport = useHeaderTransport;
         this.executor = executor;
     }
@@ -90,6 +94,10 @@ public class ThriftServerDef
     public TProtocolFactory getOutProtocolFactory()
     {
         return outProtocolFact;
+    }
+
+    public int getClientIdleTimeoutMillis() {
+        return clientIdleTimeoutMillis;
     }
 
     public boolean isHeaderTransport()
