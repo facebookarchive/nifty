@@ -24,7 +24,7 @@ import java.net.InetSocketAddress;
 public abstract class AbstractClientConnector<T extends NiftyClientChannel>
         implements NiftyClientConnector<T>
 {
-    private InetSocketAddress address;
+    private final InetSocketAddress address;
 
     public AbstractClientConnector(InetSocketAddress address) {
         this.address = address;

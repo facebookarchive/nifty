@@ -15,6 +15,7 @@
  */
 package com.facebook.nifty.client;
 
+import com.google.common.base.Preconditions;
 import com.google.common.net.HostAndPort;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -24,27 +25,34 @@ import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
 import org.jboss.netty.handler.codec.http.HttpClientCodec;
 import org.jboss.netty.util.Timer;
 
+import javax.validation.constraints.NotNull;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class HttpClientConnector extends AbstractClientConnector<HttpClientChannel> {
     private final URI endpointUri;
 
-    public HttpClientConnector(String hostName, String servicePath) throws URISyntaxException {
-        super(new InetSocketAddress(HostAndPort.fromString(hostName).getHostText(),
-                                    HostAndPort.fromString(hostName).getPort()));
+    public HttpClientConnector(String hostNameAndPort, String servicePath)
+            throws URISyntaxException {
+        super(new InetSocketAddress(HostAndPort.fromString(hostNameAndPort).getHostText(),
+                                    HostAndPort.fromString(hostNameAndPort).getPort()));
 
-        this.endpointUri = new URI("http", hostName, servicePath, null);
+        this.endpointUri = new URI("http", hostNameAndPort, servicePath, null);
     }
 
     public HttpClientConnector(URI uri) {
-        super(HostAndPort.fromParts(uri.getHost(), uri.getPort()));
 
-        if (uri.getScheme().compareTo("http") != 0 &&
-            uri.getScheme().compareTo("https") != 0) {
-            throw new IllegalArgumentException("HTTP connector only connects to HTTP/HTTPS URIs");
-        }
+        super(HostAndPort.fromParts(checkNotNull(uri).getHost(), checkNotNull(uri).getPort()));
+
+        checkArgument(uri.isAbsolute() && !uri.isOpaque(),
+                      "HttpClientConnector requires an absolute URI with a path");
+        checkArgument(uri.getScheme().compareTo("http") != 0 &&
+                      uri.getScheme().compareTo("https") != 0,
+                      "HttpClientConnector only connects to HTTP/HTTPS URIs");
 
         this.endpointUri = uri;
     }

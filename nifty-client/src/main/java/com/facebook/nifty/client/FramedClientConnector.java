@@ -26,7 +26,23 @@ import org.jboss.netty.util.Timer;
 
 import java.net.InetSocketAddress;
 
+/***
+ * A {@link NiftyClientConnector} specialized for {@link FramedClientConnector}
+ */
 public class FramedClientConnector extends AbstractClientConnector<FramedClientChannel> {
+    // TFramedTransport framing appears at the front of the message
+    private static final int LENGTH_FIELD_OFFSET = 0;
+
+    // TFramedTransport framing is four bytes long
+    private static final int LENGTH_FIELD_LENGTH = 4;
+
+    // TFramedTransport framing represents message size *not including* framing so no adjustment
+    // is necessary
+    private static final int LENGTH_ADJUSTMENT = 0;
+
+    // The client expects to see only the message *without* any framing, this strips it off
+    private static final int INITIAL_BYTES_TO_STRIP = LENGTH_FIELD_LENGTH;
+
     public FramedClientConnector(InetSocketAddress address) {
         super(address);
     }
@@ -49,9 +65,15 @@ public class FramedClientConnector extends AbstractClientConnector<FramedClientC
             public ChannelPipeline getPipeline()
                     throws Exception {
                 ChannelPipeline cp = Channels.pipeline();
-                cp.addLast("frameEncoder", new LengthFieldPrepender(4));
-                cp.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(maxFrameSize,
-                                                                            0, 4, 0, 4));
+                cp.addLast("frameEncoder", new LengthFieldPrepender(LENGTH_FIELD_LENGTH));
+                cp.addLast(
+                        "frameDecoder",
+                        new LengthFieldBasedFrameDecoder(
+                                maxFrameSize,
+                                LENGTH_FIELD_OFFSET,
+                                LENGTH_FIELD_LENGTH,
+                                LENGTH_ADJUSTMENT,
+                                INITIAL_BYTES_TO_STRIP));
                 return cp;
             }
         };
