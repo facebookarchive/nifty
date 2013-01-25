@@ -15,7 +15,6 @@
  */
 package com.facebook.nifty.client;
 
-import com.google.common.base.Preconditions;
 import com.google.common.net.HostAndPort;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -25,7 +24,6 @@ import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
 import org.jboss.netty.handler.codec.http.HttpClientCodec;
 import org.jboss.netty.util.Timer;
 
-import javax.validation.constraints.NotNull;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,19 +43,26 @@ public class HttpClientConnector extends AbstractClientConnector<HttpClientChann
     }
 
     public HttpClientConnector(URI uri) {
-
-        super(HostAndPort.fromParts(checkNotNull(uri).getHost(), checkNotNull(uri).getPort()));
+        super(HostAndPort.fromParts(checkNotNull(uri).getHost(), getPort(uri)));
 
         checkArgument(uri.isAbsolute() && !uri.isOpaque(),
                       "HttpClientConnector requires an absolute URI with a path");
-        checkArgument(uri.getScheme().compareTo("http") != 0 &&
-                      uri.getScheme().compareTo("https") != 0,
-                      "HttpClientConnector only connects to HTTP/HTTPS URIs");
 
         this.endpointUri = uri;
     }
 
-    @Override
+  public static int getPort(URI uri) {
+    URI uriNN = checkNotNull(uri);
+    if (uri.getScheme().toLowerCase().equals("http")) {
+      return uriNN.getPort() == -1 ? 80 : uriNN.getPort();
+    } else if (uri.getScheme().toLowerCase().equals("https")) {
+      return uriNN.getPort() == -1 ? 443 : uriNN.getPort();
+    } else {
+      throw new IllegalArgumentException("HttpClientConnector only connects to HTTP/HTTPS URIs");
+    }
+  }
+
+  @Override
     public HttpClientChannel newThriftClientChannel(Channel nettyChannel, Timer timer) {
         HttpClientChannel channel =
                 new HttpClientChannel(nettyChannel,
