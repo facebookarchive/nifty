@@ -69,8 +69,8 @@ public class NiftyClient implements Closeable
     public NiftyClient(int maxFrameSize)
     {
         this(new NettyClientConfigBuilder(),
-                getExitingExecutorService((ThreadPoolExecutor) newCachedThreadPool()),
-                getExitingExecutorService((ThreadPoolExecutor) newCachedThreadPool()),
+                getExitingExecutorService((ThreadPoolExecutor) newCachedThreadPool(), 1, TimeUnit.SECONDS),
+                getExitingExecutorService((ThreadPoolExecutor) newCachedThreadPool(), 1, TimeUnit.SECONDS),
                 maxFrameSize,
                 null);
     }
