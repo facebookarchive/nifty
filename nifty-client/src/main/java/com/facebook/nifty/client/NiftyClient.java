@@ -19,6 +19,7 @@ import com.facebook.nifty.client.socks.Socks4ClientBootstrap;
 import com.facebook.nifty.core.ShutdownUtil;
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.airlift.units.Duration;
 import org.apache.thrift.transport.TTransportException;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -28,6 +29,7 @@ import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import org.jboss.netty.channel.socket.nio.NioWorkerPool;
 import org.jboss.netty.util.HashedWheelTimer;
 
 import javax.annotation.Nullable;
@@ -40,6 +42,11 @@ import static java.util.concurrent.Executors.newCachedThreadPool;
 
 public class NiftyClient implements Closeable
 {
+    // The constants come directly from Netty but are private in Netty. We need these default
+    // values to call the NioClientSocketChannelFactory constructor with a custom timer.
+    private static final int DEFAULT_BOSS_COUNT = 1;
+    private static final int DEFAULT_IO_THREADS = Runtime.getRuntime().availableProcessors() * 2;
+
     public static final Duration DEFAULT_CONNECT_TIMEOUT = new Duration(2, TimeUnit.SECONDS);
     public static final Duration DEFAULT_READ_TIMEOUT = new Duration(2, TimeUnit.SECONDS);
     private static final Duration DEFAULT_WRITE_TIMEOUT = new Duration(2, TimeUnit.SECONDS);
@@ -51,37 +58,33 @@ public class NiftyClient implements Closeable
     private final NioClientSocketChannelFactory channelFactory;
     private final InetSocketAddress defaultSocksProxyAddress;
     private final ChannelGroup allChannels = new DefaultChannelGroup();
-    private final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
+    private final HashedWheelTimer hashedWheelTimer;
 
     /**
      * Creates a new NiftyClient with defaults: cachedThreadPool for bossExecutor and workerExecutor
      */
     public NiftyClient()
     {
-        this(new NettyClientConfigBuilder(),
-             newCachedThreadPool(),
-             newCachedThreadPool(),
-             null);
+        this(new NettyClientConfigBuilder());
     }
 
-    public NiftyClient(NettyClientConfigBuilder configBuilder,
-            ExecutorService boss,
-            ExecutorService worker)
+    public NiftyClient(NettyClientConfigBuilder configBuilder)
     {
-        this(configBuilder, boss, worker, null);
+        this(configBuilder, null);
     }
 
     public NiftyClient(
             NettyClientConfigBuilder configBuilder,
-            ExecutorService boss,
-            ExecutorService worker,
             @Nullable InetSocketAddress defaultSocksProxyAddress)
     {
         this.configBuilder = configBuilder;
-        this.bossExecutor = boss;
-        this.workerExecutor = worker;
+
+        this.hashedWheelTimer = new HashedWheelTimer(new ThreadFactoryBuilder().setNameFormat("nifty-client-timer-%s").setDaemon(true).build());
+        this.bossExecutor = newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("nifty-client-boss-%s").setDaemon(true).build());
+        this.workerExecutor = newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("nifty-client-worker-%s").setDaemon(true).build());
         this.defaultSocksProxyAddress = defaultSocksProxyAddress;
-        this.channelFactory = new NioClientSocketChannelFactory(boss, worker);
+        NioWorkerPool workerPool = new NioWorkerPool(workerExecutor, DEFAULT_IO_THREADS);
+        this.channelFactory = new NioClientSocketChannelFactory(bossExecutor, DEFAULT_BOSS_COUNT, workerPool, hashedWheelTimer);
     }
 
     public <T extends NiftyClientChannel> ListenableFuture<T> connectAsync(
