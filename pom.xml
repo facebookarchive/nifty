@@ -42,9 +42,6 @@ limitations under the License.
         <!-- it dependends on airlift, which is 1.7 only.               -->
         <!-- <project.build.targetJdk>1.6</project.build.targetJdk>     -->
 
-        <fb.check.fail-pmd>false</fb.check.fail-pmd>
-        <fb.check.fail-findbugs>false</fb.check.fail-findbugs>
-
         <dep.airlift.version>0.70</dep.airlift.version>
     </properties>
 
@@ -166,6 +163,20 @@ limitations under the License.
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+
+                <!-- Configure findbugs plugin to skip checking of thrift-generated files -->
+                <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>findbugs-maven-plugin</artifactId>
+                  <configuration>
+                    <!--
+                        NOTE: It would make more sense to have an exclude filter file per sub-module
+                        but findbugs-maven-plugin has a bug that it will continue using the first
+                        filter file it saw for the rest of the mvn process (even in different sub-modules).
+                    -->
+                    <excludeFilterFile>src/findbugs/findbugs-exclude-filter.xml</excludeFilterFile>
+                  </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
