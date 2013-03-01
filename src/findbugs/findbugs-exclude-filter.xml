@@ -17,27 +17,27 @@
 
 -->
 <FindBugsFilter>
-  <!-- nifty-examples excludes -->
-  <Match>
-    <Class name="com.facebook.nifty.test.scribe"/>
-  </Match>
-  <Match>
-    <Class name="~com\.facebook\.nifty\.test\.scribe\$.*"/>
-  </Match>
-  <Match>
-    <Class name="com.facebook.nifty.test.LogEntry"/>
-  </Match>
-  <Match>
-    <Class name="com.facebook.nifty.test.ResultCode"/>
-  </Match>
-  <!-- nifty-load-tester excludes -->
-  <Match>
-    <Class name="com.facebook.nifty.perf.LoadTest"/>
-  </Match>
-  <Match>
-    <Class name="com.facebook.nifty.perf.LoadError"/>
-  </Match>
-  <Match>
-    <Class name="~com\.facebook\.nifty\.perf\.LoadTest\$.*"/>
-  </Match>
+    <!-- nifty-examples excludes -->
+    <Match>
+        <Class name="com.facebook.nifty.test.scribe"/>
+    </Match>
+    <Match>
+        <Class name="~com\.facebook\.nifty\.test\.scribe\$.*"/>
+    </Match>
+    <Match>
+        <Class name="com.facebook.nifty.test.LogEntry"/>
+    </Match>
+    <Match>
+        <Class name="com.facebook.nifty.test.ResultCode"/>
+    </Match>
+    <!-- nifty-load-tester excludes -->
+    <Match>
+        <Class name="com.facebook.nifty.perf.LoadTest"/>
+    </Match>
+    <Match>
+        <Class name="com.facebook.nifty.perf.LoadError"/>
+    </Match>
+    <Match>
+        <Class name="~com\.facebook\.nifty\.perf\.LoadTest\$.*"/>
+    </Match>
 </FindBugsFilter>
