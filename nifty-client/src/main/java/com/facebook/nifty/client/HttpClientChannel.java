@@ -15,6 +15,7 @@
  */
 package com.facebook.nifty.client;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HttpHeaders;
 import org.apache.thrift.transport.TTransportException;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -117,7 +118,12 @@ public class HttpClientChannel extends AbstractClientChannel {
 
     public void setHeaders(Map<String, String> headers)
     {
-        this.headerDictionary = headers;
+        this.headerDictionary = ImmutableMap.copyOf(headers);
+    }
+
+    public ImmutableMap<String, String> getHeaders()
+    {
+        return ImmutableMap.copyOf(this.headerDictionary);
     }
 
 }
