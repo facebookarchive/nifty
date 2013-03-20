@@ -57,6 +57,8 @@ public class NiftyClient implements Closeable
     private final NettyClientConfigBuilder configBuilder;
     private final ExecutorService bossExecutor;
     private final ExecutorService workerExecutor;
+    private final NioWorkerPool workerPool;
+    private final NioClientBossPool bossPool;
     private final NioClientSocketChannelFactory channelFactory;
     private final InetSocketAddress defaultSocksProxyAddress;
     private final ChannelGroup allChannels = new DefaultChannelGroup();
@@ -92,9 +94,9 @@ public class NiftyClient implements Closeable
 
         int bossThreadCount = configBuilder.getNiftyBossThreadCount();
         int workerThreadCount = configBuilder.getNiftyWorkerThreadCount();
-        NioWorkerPool workerPool = new NioWorkerPool(workerExecutor, workerThreadCount, ThreadNameDeterminer.CURRENT);
-        NioClientBossPool bossPool = new NioClientBossPool(bossExecutor, bossThreadCount, hashedWheelTimer, ThreadNameDeterminer.CURRENT);
-        this.channelFactory = new NioClientSocketChannelFactory(bossPool, workerPool);
+        this.workerPool = new NioWorkerPool(workerExecutor, workerThreadCount, ThreadNameDeterminer.CURRENT);
+        this.bossPool = new NioClientBossPool(bossExecutor, bossThreadCount, hashedWheelTimer, ThreadNameDeterminer.CURRENT);
+        this.channelFactory = new NioClientSocketChannelFactory(this.bossPool, this.workerPool);
     }
 
     public <T extends NiftyClientChannel> ListenableFuture<T> connectAsync(
@@ -234,6 +236,8 @@ public class NiftyClient implements Closeable
         // Stop the timer thread first, so no timeouts can fire during the rest of the
         // shutdown process
         hashedWheelTimer.stop();
+        bossPool.shutdown();
+        workerPool.shutdown();
 
         ShutdownUtil.shutdownChannelFactory(channelFactory,
                                             bossExecutor,
