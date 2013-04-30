@@ -24,6 +24,7 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.ServerChannelFactory;
 import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.util.ExternalResourceReleasable;
 import org.jboss.netty.util.Timer;
@@ -73,10 +74,19 @@ public class NettyServerTransport implements ExternalResourceReleasable
         else {
             this.pipelineFactory = getStandardChannelPipelineFactory();
         }
-
     }
 
-    public void start(ServerChannelFactory serverChannelFactory)
+    public synchronized void start()
+    {
+        start(new NioServerSocketChannelFactory());
+    }
+
+    public synchronized void start(ExecutorService bossExecutor, ExecutorService workerExecutor)
+    {
+        start(new NioServerSocketChannelFactory(bossExecutor, workerExecutor));
+    }
+
+    public synchronized void start(ServerChannelFactory serverChannelFactory)
     {
         bootstrap = new ServerBootstrap(serverChannelFactory);
         bootstrap.setOptions(configBuilder.getOptions());
