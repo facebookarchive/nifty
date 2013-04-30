@@ -51,24 +51,24 @@ public class NettyServerTransport implements ExternalResourceReleasable
     private static final int NO_ALL_IDLE_TIMEOUT = 0;
     private ServerBootstrap bootstrap;
     private Channel serverChannel;
-    private final ThriftServerDef def;
+    private final ThriftServerDef thriftServerDef;
     private final NettyConfigBuilder configBuilder;
     private final ChannelGroup allChannels;
     private final Timer timer;
 
     @Inject
     public NettyServerTransport(
-            final ThriftServerDef def,
+            final ThriftServerDef thriftServerDef,
             NettyConfigBuilder configBuilder,
             final ChannelGroup allChannels,
             final Timer timer)
     {
-        this.def = def;
+        this.thriftServerDef = thriftServerDef;
         this.configBuilder = configBuilder;
         this.allChannels = allChannels;
         this.timer = timer;
-        this.port = def.getServerPort();
-        if (def.isHeaderTransport()) {
+        this.port = thriftServerDef.getServerPort();
+        if (thriftServerDef.isHeaderTransport()) {
             this.pipelineFactory = getHeaderChannelPipelineFactory();
         }
         else {
@@ -91,7 +91,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
         bootstrap = new ServerBootstrap(serverChannelFactory);
         bootstrap.setOptions(configBuilder.getOptions());
         bootstrap.setPipelineFactory(pipelineFactory);
-        log.info("starting transport {}:{}", def.getName(), port);
+        log.info("starting transport {}:{}", thriftServerDef.getName(), port);
         serverChannel = bootstrap.bind(new InetSocketAddress(port));
     }
 
@@ -99,7 +99,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
             throws InterruptedException
     {
         if (serverChannel != null) {
-            log.info("stopping transport {}:{}", def.getName(), port);
+            log.info("stopping transport {}:{}", thriftServerDef.getName(), port);
             // first stop accepting
             final CountDownLatch latch = new CountDownLatch(1);
             serverChannel.close().addListener(new ChannelFutureListener()
@@ -109,8 +109,8 @@ public class NettyServerTransport implements ExternalResourceReleasable
                         throws Exception
                 {
                     // stop and process remaining in-flight invocations
-                    if (def.getExecutor() instanceof ExecutorService) {
-                        ExecutorService exe = (ExecutorService) def.getExecutor();
+                    if (thriftServerDef.getExecutor() instanceof ExecutorService) {
+                        ExecutorService exe = (ExecutorService) thriftServerDef.getExecutor();
                         ShutdownUtil.shutdownExecutor(exe, "dispatcher");
                     }
                     latch.countDown();
@@ -141,19 +141,19 @@ public class NettyServerTransport implements ExternalResourceReleasable
             {
                 ChannelPipeline cp = Channels.pipeline();
                 cp.addLast(ChannelStatistics.NAME, new ChannelStatistics(allChannels));
-                cp.addLast("frameDecoder", new ThriftMessageDecoder(def.getMaxFrameSize(),
-                                                                    def.getInProtocolFactory()));
-                if (def.getClientIdleTimeout() != null) {
+                cp.addLast("frameDecoder", new ThriftMessageDecoder(thriftServerDef.getMaxFrameSize(),
+                                                                    thriftServerDef.getInProtocolFactory()));
+                if (thriftServerDef.getClientIdleTimeout() != null) {
                     // Add handlers to detect idle client connections and disconnect them
                     cp.addLast("idleTimeoutHandler", new IdleStateHandler(timer,
-                                                                          (int)def.getClientIdleTimeout().toMillis(),
+                                                                          (int) thriftServerDef.getClientIdleTimeout().toMillis(),
                                                                           NO_WRITER_IDLE_TIMEOUT,
                                                                           NO_ALL_IDLE_TIMEOUT,
                                                                           TimeUnit.MILLISECONDS
                     ));
                     cp.addLast("idleDisconnectHandler", new IdleDisconnectHandler());
                 }
-                cp.addLast("dispatcher", new NiftyDispatcher(def));
+                cp.addLast("dispatcher", new NiftyDispatcher(thriftServerDef));
                 return cp;
             }
         };
@@ -162,6 +162,16 @@ public class NettyServerTransport implements ExternalResourceReleasable
     protected synchronized ChannelPipelineFactory getHeaderChannelPipelineFactory()
     {
         throw new UnsupportedOperationException("ASF version does not support THeaderTransport !");
+    }
+
+    protected final ChannelGroup getAllChannels()
+    {
+        return allChannels;
+    }
+
+    protected final ThriftServerDef getThriftServerDef()
+    {
+        return thriftServerDef;
     }
 
 }
