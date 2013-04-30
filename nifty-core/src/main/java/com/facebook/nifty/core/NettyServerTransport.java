@@ -52,6 +52,8 @@ public class NettyServerTransport implements ExternalResourceReleasable
     private Channel serverChannel;
     private final ThriftServerDef def;
     private final NettyConfigBuilder configBuilder;
+    private final ChannelGroup allChannels;
+    private final Timer timer;
 
     @Inject
     public NettyServerTransport(
@@ -62,35 +64,14 @@ public class NettyServerTransport implements ExternalResourceReleasable
     {
         this.def = def;
         this.configBuilder = configBuilder;
+        this.allChannels = allChannels;
+        this.timer = timer;
         this.port = def.getServerPort();
         if (def.isHeaderTransport()) {
-            throw new UnsupportedOperationException("ASF version does not support THeaderTransport !");
+            this.pipelineFactory = getHeaderChannelPipelineFactory();
         }
         else {
-            this.pipelineFactory = new ChannelPipelineFactory()
-            {
-                @Override
-                public ChannelPipeline getPipeline()
-                        throws Exception
-                {
-                    ChannelPipeline cp = Channels.pipeline();
-                    cp.addLast(ChannelStatistics.NAME, new ChannelStatistics(allChannels));
-                    cp.addLast("frameDecoder", new ThriftMessageDecoder(def.getMaxFrameSize(),
-                                                                        def.getInProtocolFactory()));
-                    if (def.getClientIdleTimeout() != null) {
-                        // Add handlers to detect idle client connections and disconnect them
-                        cp.addLast("idleTimeoutHandler", new IdleStateHandler(timer,
-                                                                              (int)def.getClientIdleTimeout().toMillis(),
-                                                                              NO_WRITER_IDLE_TIMEOUT,
-                                                                              NO_ALL_IDLE_TIMEOUT,
-                                                                              TimeUnit.MILLISECONDS
-                                                                              ));
-                        cp.addLast("idleDisconnectHandler", new IdleDisconnectHandler());
-                    }
-                    cp.addLast("dispatcher", new NiftyDispatcher(def));
-                    return cp;
-                }
-            };
+            this.pipelineFactory = getStandardChannelPipelineFactory();
         }
 
     }
@@ -139,4 +120,38 @@ public class NettyServerTransport implements ExternalResourceReleasable
     {
         bootstrap.releaseExternalResources();
     }
+
+    protected synchronized ChannelPipelineFactory getStandardChannelPipelineFactory()
+    {
+        return new ChannelPipelineFactory()
+        {
+            @Override
+            public ChannelPipeline getPipeline()
+                    throws Exception
+            {
+                ChannelPipeline cp = Channels.pipeline();
+                cp.addLast(ChannelStatistics.NAME, new ChannelStatistics(allChannels));
+                cp.addLast("frameDecoder", new ThriftMessageDecoder(def.getMaxFrameSize(),
+                                                                    def.getInProtocolFactory()));
+                if (def.getClientIdleTimeout() != null) {
+                    // Add handlers to detect idle client connections and disconnect them
+                    cp.addLast("idleTimeoutHandler", new IdleStateHandler(timer,
+                                                                          (int)def.getClientIdleTimeout().toMillis(),
+                                                                          NO_WRITER_IDLE_TIMEOUT,
+                                                                          NO_ALL_IDLE_TIMEOUT,
+                                                                          TimeUnit.MILLISECONDS
+                    ));
+                    cp.addLast("idleDisconnectHandler", new IdleDisconnectHandler());
+                }
+                cp.addLast("dispatcher", new NiftyDispatcher(def));
+                return cp;
+            }
+        };
+    }
+
+    protected synchronized ChannelPipelineFactory getHeaderChannelPipelineFactory()
+    {
+        throw new UnsupportedOperationException("ASF version does not support THeaderTransport !");
+    }
+
 }
