@@ -78,7 +78,8 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
         }
     }
 
-    private void processRequest(final ChannelHandlerContext ctx, final TNiftyTransport messageTransport) {
+    protected void processRequest(final ChannelHandlerContext ctx, final TNiftyTransport messageTransport)
+    {
         // Remember the ordering of requests as they arrive, used to enforce an order on the
         // responses.
         final int requestSequenceId = dispatcherSequenceId.incrementAndGet();
@@ -121,7 +122,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
         });
     }
 
-    private void writeResponse(ChannelHandlerContext ctx,
+    protected void writeResponse(ChannelHandlerContext ctx,
                                TNiftyTransport messageTransport,
                                int responseSequenceId) {
         // Ensure responses to requests are written in the same order the requests
@@ -157,7 +158,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
         }
     }
 
-    private ChannelBuffer addFraming(ChannelBuffer response, ThriftTransportType transportType) {
+    protected ChannelBuffer addFraming(ChannelBuffer response, ThriftTransportType transportType) {
         if (transportType == ThriftTransportType.UNFRAMED) {
             return response;
         }
@@ -179,14 +180,14 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
         closeChannel(ctx);
     }
 
-    private void closeChannel(ChannelHandlerContext ctx)
+    protected void closeChannel(ChannelHandlerContext ctx)
     {
         if (ctx.getChannel().isOpen()) {
             ctx.getChannel().close();
         }
     }
 
-    private enum ReadBlockedState {
+    protected enum ReadBlockedState {
         NOT_BLOCKED,
         BLOCKED,
     }
@@ -198,11 +199,11 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
         super.channelOpen(ctx, e);
     }
 
-    private boolean isChannelReadBlocked(ChannelHandlerContext ctx) {
+    protected boolean isChannelReadBlocked(ChannelHandlerContext ctx) {
         return ctx.getAttachment() == ReadBlockedState.BLOCKED;
     }
 
-    private void blockChannelReads(ChannelHandlerContext ctx) {
+    protected void blockChannelReads(ChannelHandlerContext ctx) {
         // Remember that reads are blocked (there is no Channel.getReadable())
         ctx.setAttachment(ReadBlockedState.BLOCKED);
 
@@ -215,7 +216,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
         ctx.getChannel().setReadable(false);
     }
 
-    private void unblockChannelReads(ChannelHandlerContext ctx) {
+    protected void unblockChannelReads(ChannelHandlerContext ctx) {
         // Remember that reads are unblocked (there is no Channel.getReadable())
         ctx.setAttachment(ReadBlockedState.NOT_BLOCKED);
         ctx.getChannel().setReadable(true);
