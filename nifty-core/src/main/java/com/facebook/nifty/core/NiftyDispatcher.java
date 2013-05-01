@@ -71,14 +71,19 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
     {
         if (e.getMessage() instanceof TNiftyTransport) {
             TNiftyTransport messageTransport = (TNiftyTransport) e.getMessage();
-            processRequest(ctx, messageTransport);
+            TProtocol inputProtocol = inProtocolFactory.getProtocol(messageTransport);
+            TProtocol outputProtocol = outProtocolFactory.getProtocol(messageTransport);
+            processRequest(ctx, messageTransport, inputProtocol, outputProtocol);
         }
         else {
             ctx.sendUpstream(e);
         }
     }
 
-    protected void processRequest(final ChannelHandlerContext ctx, final TNiftyTransport messageTransport)
+    protected void processRequest(final ChannelHandlerContext ctx,
+                                  final TNiftyTransport messageTransport,
+                                  final TProtocol inputProtocol,
+                                  final TProtocol outputProtocol)
     {
         // Remember the ordering of requests as they arrive, used to enforce an order on the
         // responses.
@@ -104,13 +109,9 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
             @Override
             public void run()
             {
-                TProtocol inProtocol = inProtocolFactory.getProtocol(messageTransport);
-                TProtocol outProtocol = outProtocolFactory.getProtocol(messageTransport);
                 try {
-                    processorFactory.getProcessor(messageTransport).process(
-                            inProtocol,
-                            outProtocol
-                    );
+                    dispatchToProcessor(ctx, processorFactory, messageTransport, inputProtocol,
+                                        outputProtocol);
                     writeResponse(ctx, messageTransport, requestSequenceId);
                 }
                 catch (TException e1) {
@@ -120,6 +121,19 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
             }
 
         });
+    }
+
+    protected void dispatchToProcessor(ChannelHandlerContext ctx,
+                                       TProcessorFactory processorFactory,
+                                       TNiftyTransport messageTransport,
+                                       TProtocol inputProtocol,
+                                       TProtocol outputProtocol)
+            throws TException
+    {
+        processorFactory.getProcessor(messageTransport).process(
+                inputProtocol,
+                outputProtocol
+        );
     }
 
     protected void writeResponse(ChannelHandlerContext ctx,
