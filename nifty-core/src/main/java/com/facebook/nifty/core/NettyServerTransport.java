@@ -15,6 +15,8 @@
  */
 package com.facebook.nifty.core;
 
+import com.google.common.util.concurrent.AbstractFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
@@ -24,6 +26,7 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.ServerChannelFactory;
 import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.util.ExternalResourceReleasable;
 import org.jboss.netty.util.Timer;
@@ -35,6 +38,8 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A core channel the decode framed Thrift message, dispatches to the TProcessor given
@@ -50,65 +55,62 @@ public class NettyServerTransport implements ExternalResourceReleasable
     private static final int NO_ALL_IDLE_TIMEOUT = 0;
     private ServerBootstrap bootstrap;
     private Channel serverChannel;
-    private final ThriftServerDef def;
+    private final ThriftServerDef thriftServerDef;
     private final NettyConfigBuilder configBuilder;
+    private final ChannelGroup allChannels;
+    private final Timer timer;
+    private final ServerStopFuture serverStopFuture = new ServerStopFuture();
 
     @Inject
     public NettyServerTransport(
-            final ThriftServerDef def,
+            final ThriftServerDef thriftServerDef,
             NettyConfigBuilder configBuilder,
             final ChannelGroup allChannels,
             final Timer timer)
     {
-        this.def = def;
+        this.thriftServerDef = thriftServerDef;
         this.configBuilder = configBuilder;
-        this.port = def.getServerPort();
-        if (def.isHeaderTransport()) {
-            throw new UnsupportedOperationException("ASF version does not support THeaderTransport !");
+        this.allChannels = allChannels;
+        this.timer = timer;
+        this.port = thriftServerDef.getServerPort();
+        if (thriftServerDef.isHeaderTransport()) {
+            this.pipelineFactory = getHeaderChannelPipelineFactory();
         }
         else {
-            this.pipelineFactory = new ChannelPipelineFactory()
-            {
-                @Override
-                public ChannelPipeline getPipeline()
-                        throws Exception
-                {
-                    ChannelPipeline cp = Channels.pipeline();
-                    cp.addLast(ChannelStatistics.NAME, new ChannelStatistics(allChannels));
-                    cp.addLast("frameDecoder", new ThriftFrameDecoder(def.getMaxFrameSize(),
-                                                                      def.getInProtocolFactory()));
-                    if (def.getClientIdleTimeout() != null) {
-                        // Add handlers to detect idle client connections and disconnect them
-                        cp.addLast("idleTimeoutHandler", new IdleStateHandler(timer,
-                                                                              (int)def.getClientIdleTimeout().toMillis(),
-                                                                              NO_WRITER_IDLE_TIMEOUT,
-                                                                              NO_ALL_IDLE_TIMEOUT,
-                                                                              TimeUnit.MILLISECONDS
-                                                                              ));
-                        cp.addLast("idleDisconnectHandler", new IdleDisconnectHandler());
-                    }
-                    cp.addLast("dispatcher", new NiftyDispatcher(def));
-                    return cp;
-                }
-            };
+            this.pipelineFactory = getStandardChannelPipelineFactory();
         }
-
     }
 
-    public void start(ServerChannelFactory serverChannelFactory)
+    public synchronized void start()
     {
+        start(new NioServerSocketChannelFactory());
+    }
+
+    public synchronized void start(ExecutorService bossExecutor, ExecutorService workerExecutor)
+    {
+        start(new NioServerSocketChannelFactory(bossExecutor, workerExecutor));
+    }
+
+    public synchronized void start(ServerChannelFactory serverChannelFactory)
+    {
+        // Server is already running
+        checkState(!isRunning());
+
+        // Server has already been started and stopped
+        checkState(!serverStopFuture.isDone());
+
         bootstrap = new ServerBootstrap(serverChannelFactory);
         bootstrap.setOptions(configBuilder.getOptions());
         bootstrap.setPipelineFactory(pipelineFactory);
-        log.info("starting transport {}:{}", def.getName(), port);
+        log.info("starting transport {}:{}", thriftServerDef.getName(), port);
         serverChannel = bootstrap.bind(new InetSocketAddress(port));
     }
 
-    public void stop()
+    public synchronized void stop()
             throws InterruptedException
     {
         if (serverChannel != null) {
-            log.info("stopping transport {}:{}", def.getName(), port);
+            log.info("stopping transport {}:{}", thriftServerDef.getName(), port);
             // first stop accepting
             final CountDownLatch latch = new CountDownLatch(1);
             serverChannel.close().addListener(new ChannelFutureListener()
@@ -118,8 +120,8 @@ public class NettyServerTransport implements ExternalResourceReleasable
                         throws Exception
                 {
                     // stop and process remaining in-flight invocations
-                    if (def.getExecutor() instanceof ExecutorService) {
-                        ExecutorService exe = (ExecutorService) def.getExecutor();
+                    if (thriftServerDef.getExecutor() instanceof ExecutorService) {
+                        ExecutorService exe = (ExecutorService) thriftServerDef.getExecutor();
                         ShutdownUtil.shutdownExecutor(exe, "dispatcher");
                     }
                     latch.countDown();
@@ -127,16 +129,84 @@ public class NettyServerTransport implements ExternalResourceReleasable
             });
             latch.await();
             serverChannel = null;
+
+            serverStopFuture.setServerStopped();
         }
     }
 
-    public Channel getServerChannel() {
+    public boolean isRunning()
+    {
+        return getServerChannel() != null;
+    }
+
+    public Channel getServerChannel()
+    {
         return serverChannel;
     }
 
     @Override
-    public void releaseExternalResources()
+    public synchronized void releaseExternalResources()
     {
         bootstrap.releaseExternalResources();
+    }
+
+    protected synchronized ChannelPipelineFactory getStandardChannelPipelineFactory()
+    {
+        return new ChannelPipelineFactory()
+        {
+            @Override
+            public ChannelPipeline getPipeline()
+                    throws Exception
+            {
+                ChannelPipeline cp = Channels.pipeline();
+                cp.addLast(ChannelStatistics.NAME, new ChannelStatistics(allChannels));
+                cp.addLast("frameDecoder", new ThriftMessageDecoder(thriftServerDef.getMaxFrameSize(),
+                                                                    thriftServerDef.getInProtocolFactory()));
+                if (thriftServerDef.getClientIdleTimeout() != null) {
+                    // Add handlers to detect idle client connections and disconnect them
+                    cp.addLast("idleTimeoutHandler", new IdleStateHandler(timer,
+                                                                          (int) thriftServerDef.getClientIdleTimeout().toMillis(),
+                                                                          NO_WRITER_IDLE_TIMEOUT,
+                                                                          NO_ALL_IDLE_TIMEOUT,
+                                                                          TimeUnit.MILLISECONDS
+                    ));
+                    cp.addLast("idleDisconnectHandler", new IdleDisconnectHandler());
+                }
+                cp.addLast("dispatcher", new NiftyDispatcher(thriftServerDef));
+                return cp;
+            }
+        };
+    }
+
+    protected synchronized ChannelPipelineFactory getHeaderChannelPipelineFactory()
+    {
+        throw new UnsupportedOperationException("ASF version does not support THeaderTransport !");
+    }
+
+    /**
+     * Returns a {@link ListenableFuture} that will complete when the server has been stopped
+     * @return
+     */
+    public synchronized ListenableFuture<Void> getStopFuture()
+    {
+        return serverStopFuture;
+    }
+
+    protected final ChannelGroup getAllChannels()
+    {
+        return allChannels;
+    }
+
+    protected final ThriftServerDef getThriftServerDef()
+    {
+        return thriftServerDef;
+    }
+
+    private static class ServerStopFuture extends AbstractFuture<Void>
+    {
+        public void setServerStopped()
+        {
+            set(null);
+        }
     }
 }

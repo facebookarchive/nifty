@@ -21,6 +21,8 @@ import org.apache.thrift.protocol.TProtocolFactory;
 
 import java.util.concurrent.Executor;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Descriptor for a Thrift Server. This defines a listener port that Nifty need to start a Thrift endpoint.
  */
@@ -50,6 +52,7 @@ public class ThriftServerDef
             boolean useHeaderTransport,
             Executor executor)
     {
+        checkArgument(maxFrameSize > 0, "Max frame size is capped at 2GB and must be positive");
         this.name = name;
         this.serverPort = serverPort;
         this.maxFrameSize = maxFrameSize;
