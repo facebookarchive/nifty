@@ -39,7 +39,7 @@ public class ThriftFrameDecoder extends FrameDecoder {
     }
 
     @Override
-    protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer)
+    public Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer)
             throws Exception {
         if (!buffer.readable()) {
             return null;
