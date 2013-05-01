@@ -15,6 +15,8 @@
  */
 package com.facebook.nifty.core;
 
+import com.google.common.util.concurrent.AbstractFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
@@ -37,6 +39,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * A core channel the decode framed Thrift message, dispatches to the TProcessor given
  * and then encode message back to Thrift frame.
@@ -55,6 +59,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
     private final NettyConfigBuilder configBuilder;
     private final ChannelGroup allChannels;
     private final Timer timer;
+    private final ServerStopFuture serverStopFuture = new ServerStopFuture();
 
     @Inject
     public NettyServerTransport(
@@ -88,6 +93,12 @@ public class NettyServerTransport implements ExternalResourceReleasable
 
     public synchronized void start(ServerChannelFactory serverChannelFactory)
     {
+        // Server is already running
+        checkState(!isRunning());
+
+        // Server has already been started and stopped
+        checkState(!serverStopFuture.isDone());
+
         bootstrap = new ServerBootstrap(serverChannelFactory);
         bootstrap.setOptions(configBuilder.getOptions());
         bootstrap.setPipelineFactory(pipelineFactory);
@@ -95,7 +106,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
         serverChannel = bootstrap.bind(new InetSocketAddress(port));
     }
 
-    public void stop()
+    public synchronized void stop()
             throws InterruptedException
     {
         if (serverChannel != null) {
@@ -118,15 +129,23 @@ public class NettyServerTransport implements ExternalResourceReleasable
             });
             latch.await();
             serverChannel = null;
+
+            serverStopFuture.setServerStopped();
         }
     }
 
-    public Channel getServerChannel() {
+    public boolean isRunning()
+    {
+        return getServerChannel() != null;
+    }
+
+    public Channel getServerChannel()
+    {
         return serverChannel;
     }
 
     @Override
-    public void releaseExternalResources()
+    public synchronized void releaseExternalResources()
     {
         bootstrap.releaseExternalResources();
     }
@@ -164,6 +183,15 @@ public class NettyServerTransport implements ExternalResourceReleasable
         throw new UnsupportedOperationException("ASF version does not support THeaderTransport !");
     }
 
+    /**
+     * Returns a {@link ListenableFuture} that will complete when the server has been stopped
+     * @return
+     */
+    public synchronized ListenableFuture<Void> getStopFuture()
+    {
+        return serverStopFuture;
+    }
+
     protected final ChannelGroup getAllChannels()
     {
         return allChannels;
@@ -174,4 +202,11 @@ public class NettyServerTransport implements ExternalResourceReleasable
         return thriftServerDef;
     }
 
+    private static class ServerStopFuture extends AbstractFuture<Void>
+    {
+        public void setServerStopped()
+        {
+            set(null);
+        }
+    }
 }
