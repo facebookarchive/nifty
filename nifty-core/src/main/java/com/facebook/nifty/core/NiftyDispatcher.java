@@ -15,12 +15,10 @@
  */
 package com.facebook.nifty.core;
 
+import com.facebook.nifty.processor.NiftyProcessorFactory;
 import org.apache.thrift.TException;
-import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.Channels;
@@ -47,7 +45,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
 {
     private static final Logger log = LoggerFactory.getLogger(NiftyDispatcher.class);
 
-    private final TProcessorFactory processorFactory;
+    private final NiftyProcessorFactory processorFactory;
     private final TProtocolFactory inProtocolFactory;
     private final TProtocolFactory outProtocolFactory;
     private final Executor exe;
@@ -109,10 +107,8 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                 TProtocol inProtocol = inProtocolFactory.getProtocol(messageTransport);
                 TProtocol outProtocol = outProtocolFactory.getProtocol(messageTransport);
                 try {
-                    processorFactory.getProcessor(messageTransport).process(
-                            inProtocol,
-                            outProtocol
-                    );
+                    RequestContext requestContext = new RequestContext(ctx.getChannel().getRemoteAddress());
+                    processorFactory.getProcessor(messageTransport).process(inProtocol, outProtocol, requestContext);
                     writeResponse(ctx, messageTransport, requestSequenceId);
                 }
                 catch (TException e1) {
