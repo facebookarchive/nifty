@@ -61,7 +61,6 @@ public class ThriftServerDefBuilder
     private TProcessorFactory thriftProcessorFactory;
     private Executor executor;
     private String name = "nifty-" + ID.getAndIncrement();
-    private boolean useHeaderTransport;
     private Duration clientIdleTimeout;
 
     /**
@@ -82,7 +81,6 @@ public class ThriftServerDefBuilder
                 runnable.run();
             }
         };
-        this.useHeaderTransport = false;
         this.clientIdleTimeout = null;
         this.thriftFrameCodecFactory = new DefaultThriftFrameCodecFactory();
     }
@@ -223,12 +221,6 @@ public class ThriftServerDefBuilder
         return this;
     }
 
-    public ThriftServerDefBuilder usingHeaderTransport()
-    {
-        this.useHeaderTransport = true;
-        return this;
-    }
-
     /**
      * Build the ThriftServerDef
      */
@@ -253,7 +245,6 @@ public class ThriftServerDefBuilder
                 outProtocolFact,
                 niftyProcessorFactory,
                 clientIdleTimeout,
-                useHeaderTransport,
                 thriftFrameCodecFactory,
                 executor);
     }
