@@ -15,6 +15,8 @@
  */
 package com.facebook.nifty.core;
 
+import com.facebook.nifty.codec.DefaultThriftFrameCodecFactory;
+import com.facebook.nifty.codec.ThriftFrameCodecFactory;
 import io.airlift.units.Duration;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
@@ -42,6 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThriftServerDefBuilder
 {
     private static final AtomicInteger ID = new AtomicInteger(1);
+    private ThriftFrameCodecFactory thriftFrameCodecFactory;
     private int serverPort;
     private int maxFrameSize;
     private int queuedResponseLimit;
@@ -73,6 +76,7 @@ public class ThriftServerDefBuilder
         };
         this.useHeaderTransport = false;
         this.clientIdleTimeout = null;
+        this.thriftFrameCodecFactory = new DefaulThriftFrameCodecFactory();
     }
 
     /**
@@ -169,6 +173,17 @@ public class ThriftServerDefBuilder
     }
 
     /**
+     * Set the frame
+     *
+     * @param thriftFrameCodecFactory
+     */
+    public ThriftServerDefBuilder thriftFrameCodecFactory(ThriftFrameCodecFactory thriftFrameCodecFactory)
+    {
+        this.thriftFrameCodecFactory = thriftFrameCodecFactory;
+        return this;
+    }
+
+    /**
      * Specify an executor for thrift processor invocations ( i.e. = THaHsServer )
      * By default invocation happens in Netty single thread
      * ( i.e. = TNonBlockingServer )
@@ -203,6 +218,7 @@ public class ThriftServerDefBuilder
                 outProtocolFact,
                 clientIdleTimeout,
                 useHeaderTransport,
+                thriftFrameCodecFactory,
                 executor);
     }
 }
