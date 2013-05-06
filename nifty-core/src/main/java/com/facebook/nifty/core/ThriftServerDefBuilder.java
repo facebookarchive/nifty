@@ -15,14 +15,24 @@
  */
 package com.facebook.nifty.core;
 
+import com.facebook.nifty.codec.DefaultThriftFrameCodecFactory;
+import com.facebook.nifty.codec.ThriftFrameCodecFactory;
+import com.facebook.nifty.duplex.TDuplexProtocolFactory;
+import com.facebook.nifty.processor.NiftyProcessor;
+import com.facebook.nifty.processor.NiftyProcessorFactory;
 import io.airlift.units.Duration;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
+import org.apache.thrift.transport.TTransport;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.facebook.nifty.processor.NiftyProcessorAdapters.factoryFromTProcessor;
+import static com.facebook.nifty.processor.NiftyProcessorAdapters.factoryFromTProcessorFactory;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Builder for the Thrift Server descriptor. Example :
@@ -42,15 +52,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThriftServerDefBuilder
 {
     private static final AtomicInteger ID = new AtomicInteger(1);
+    private ThriftFrameCodecFactory thriftFrameCodecFactory;
     private int serverPort;
     private int maxFrameSize;
     private int queuedResponseLimit;
-    private TProcessorFactory processorFactory;
-    private TProtocolFactory inProtocolFact;
-    private TProtocolFactory outProtocolFact;
+    private NiftyProcessorFactory niftyProcessorFactory;
+    private TProcessorFactory thriftProcessorFactory;
+    private TDuplexProtocolFactory duplexProtocolFactory;
     private Executor executor;
     private String name = "nifty-" + ID.getAndIncrement();
-    private boolean useHeaderTransport;
     private Duration clientIdleTimeout;
 
     /**
@@ -61,8 +71,7 @@ public class ThriftServerDefBuilder
         this.serverPort = 8080;
         this.maxFrameSize = 1048576;
         this.queuedResponseLimit = 16;
-        this.inProtocolFact = new TBinaryProtocol.Factory();
-        this.outProtocolFact = new TBinaryProtocol.Factory();
+        this.duplexProtocolFactory = TDuplexProtocolFactory.fromSingleFactory(new TBinaryProtocol.Factory());
         this.executor = new Executor()
         {
             @Override
@@ -71,8 +80,8 @@ public class ThriftServerDefBuilder
                 runnable.run();
             }
         };
-        this.useHeaderTransport = false;
         this.clientIdleTimeout = null;
+        this.thriftFrameCodecFactory = new DefaultThriftFrameCodecFactory();
     }
 
     /**
@@ -96,19 +105,54 @@ public class ThriftServerDefBuilder
     /**
      * Specify protocolFactory for both input and output
      */
+    public ThriftServerDefBuilder speaks(TDuplexProtocolFactory tProtocolFactory)
+    {
+        this.duplexProtocolFactory = tProtocolFactory;
+        return this;
+    }
+
     public ThriftServerDefBuilder speaks(TProtocolFactory tProtocolFactory)
     {
-        this.inProtocolFact = tProtocolFactory;
-        this.outProtocolFact = tProtocolFactory;
+        this.duplexProtocolFactory = TDuplexProtocolFactory.fromSingleFactory(tProtocolFactory);
         return this;
     }
 
     /**
      * Specify the TProcessor.
      */
-    public ThriftServerDefBuilder withProcessor(TProcessor p)
+    public ThriftServerDefBuilder withProcessor(final NiftyProcessor processor)
     {
-        this.processorFactory = new TProcessorFactory(p);
+        this.niftyProcessorFactory = new NiftyProcessorFactory() {
+            @Override
+            public NiftyProcessor getProcessor(TTransport transport)
+            {
+                return processor;
+            }
+        };
+        return this;
+    }
+
+    public ThriftServerDefBuilder withProcessor(final TProcessor processor)
+    {
+        this.thriftProcessorFactory = new TProcessorFactory(processor);
+        return this;
+    }
+
+    /**
+     * Anohter way to specify the TProcessor.
+     */
+    public ThriftServerDefBuilder withProcessorFactory(NiftyProcessorFactory processorFactory)
+    {
+        this.niftyProcessorFactory = processorFactory;
+        return this;
+    }
+
+    /**
+     * Anohter way to specify the TProcessor.
+     */
+    public ThriftServerDefBuilder withProcessorFactory(TProcessorFactory processorFactory)
+    {
+        this.thriftProcessorFactory = processorFactory;
         return this;
     }
 
@@ -132,39 +176,23 @@ public class ThriftServerDefBuilder
     }
 
     /**
-     * Anohter way to specify the TProcessor.
-     */
-    public ThriftServerDefBuilder withProcessorFactory(TProcessorFactory processorFactory)
-    {
-        this.processorFactory = processorFactory;
-        return this;
-    }
-
-    /**
-     * Specify only the input protocol.
-     */
-    public ThriftServerDefBuilder inProtocol(TProtocolFactory tProtocolFactory)
-    {
-        this.inProtocolFact = tProtocolFactory;
-        return this;
-    }
-
-    /**
-     * Specify only the output protocol.
-     */
-    public ThriftServerDefBuilder outProtocol(TProtocolFactory tProtocolFactory)
-    {
-        this.outProtocolFact = tProtocolFactory;
-        return this;
-    }
-
-    /**
      * Specify timeout during which if connected client doesn't send a message, server
      * will disconnect the client
      */
     public ThriftServerDefBuilder clientIdleTimeout(Duration clientIdleTimeout)
     {
         this.clientIdleTimeout = clientIdleTimeout;
+        return this;
+    }
+
+    /**
+     * Set the frame
+     *
+     * @param thriftFrameCodecFactory
+     */
+    public ThriftServerDefBuilder thriftFrameCodecFactory(ThriftFrameCodecFactory thriftFrameCodecFactory)
+    {
+        this.thriftFrameCodecFactory = thriftFrameCodecFactory;
         return this;
     }
 
@@ -179,30 +207,30 @@ public class ThriftServerDefBuilder
         return this;
     }
 
-    public ThriftServerDefBuilder usingHeaderTransport()
-    {
-        this.useHeaderTransport = true;
-        return this;
-    }
-
     /**
      * Build the ThriftServerDef
      */
     public ThriftServerDef build()
     {
-        if (processorFactory == null) {
-            throw new IllegalStateException("processor not defined !");
+        checkState(niftyProcessorFactory != null || thriftProcessorFactory != null,
+                   "Processor not defined!");
+        checkState(niftyProcessorFactory == null || thriftProcessorFactory == null,
+                   "TProcessors will be automatically adapted to NiftyProcessors, don't specify both");
+
+        if (niftyProcessorFactory == null)
+        {
+            niftyProcessorFactory = factoryFromTProcessorFactory(thriftProcessorFactory);
         }
+
         return new ThriftServerDef(
                 name,
                 serverPort,
                 maxFrameSize,
                 queuedResponseLimit,
-                processorFactory,
-                inProtocolFact,
-                outProtocolFact,
+                niftyProcessorFactory,
+                duplexProtocolFactory,
                 clientIdleTimeout,
-                useHeaderTransport,
+                thriftFrameCodecFactory,
                 executor);
     }
 }

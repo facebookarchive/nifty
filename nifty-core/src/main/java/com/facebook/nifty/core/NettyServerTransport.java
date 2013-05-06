@@ -15,6 +15,7 @@
  */
 package com.facebook.nifty.core;
 
+import org.apache.thrift.protocol.TProtocolFactory;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
@@ -24,6 +25,7 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.ServerChannelFactory;
 import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.util.ExternalResourceReleasable;
 import org.jboss.netty.util.Timer;
@@ -63,36 +65,42 @@ public class NettyServerTransport implements ExternalResourceReleasable
         this.def = def;
         this.configBuilder = configBuilder;
         this.port = def.getServerPort();
-        if (def.isHeaderTransport()) {
-            throw new UnsupportedOperationException("ASF version does not support THeaderTransport !");
-        }
-        else {
-            this.pipelineFactory = new ChannelPipelineFactory()
-            {
-                @Override
-                public ChannelPipeline getPipeline()
-                        throws Exception
-                {
-                    ChannelPipeline cp = Channels.pipeline();
-                    cp.addLast(ChannelStatistics.NAME, new ChannelStatistics(allChannels));
-                    cp.addLast("frameDecoder", new ThriftFrameDecoder(def.getMaxFrameSize(),
-                                                                      def.getInProtocolFactory()));
-                    if (def.getClientIdleTimeout() != null) {
-                        // Add handlers to detect idle client connections and disconnect them
-                        cp.addLast("idleTimeoutHandler", new IdleStateHandler(timer,
-                                                                              (int)def.getClientIdleTimeout().toMillis(),
-                                                                              NO_WRITER_IDLE_TIMEOUT,
-                                                                              NO_ALL_IDLE_TIMEOUT,
-                                                                              TimeUnit.MILLISECONDS
-                                                                              ));
-                        cp.addLast("idleDisconnectHandler", new IdleDisconnectHandler());
-                    }
-                    cp.addLast("dispatcher", new NiftyDispatcher(def));
-                    return cp;
-                }
-            };
-        }
 
+        this.pipelineFactory = new ChannelPipelineFactory()
+        {
+            @Override
+            public ChannelPipeline getPipeline()
+                    throws Exception
+            {
+                ChannelPipeline cp = Channels.pipeline();
+                TProtocolFactory inputProtocolFactory = def.getDuplexProtocolFactory().getInputProtocolFactory();
+                cp.addLast(ChannelStatistics.NAME, new ChannelStatistics(allChannels));
+                cp.addLast("frameCodec", def.getThriftFrameCodecFactory().create(def.getMaxFrameSize(),
+                                                                                 inputProtocolFactory));
+                if (def.getClientIdleTimeout() != null) {
+                    // Add handlers to detect idle client connections and disconnect them
+                    cp.addLast("idleTimeoutHandler", new IdleStateHandler(timer,
+                                                                          (int)def.getClientIdleTimeout().toMillis(),
+                                                                          NO_WRITER_IDLE_TIMEOUT,
+                                                                          NO_ALL_IDLE_TIMEOUT,
+                                                                          TimeUnit.MILLISECONDS
+                                                                          ));
+                    cp.addLast("idleDisconnectHandler", new IdleDisconnectHandler());
+                }
+                cp.addLast("dispatcher", new NiftyDispatcher(def));
+                return cp;
+            }
+        };
+    }
+
+    public void start()
+    {
+        start(new NioServerSocketChannelFactory());
+    }
+
+    public void start(ExecutorService bossExecutor, ExecutorService ioWorkerExecutor)
+    {
+        start(new NioServerSocketChannelFactory(bossExecutor, ioWorkerExecutor));
     }
 
     public void start(ServerChannelFactory serverChannelFactory)
