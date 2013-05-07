@@ -30,8 +30,8 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,7 +52,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
     private final TProtocolFactory outProtocolFactory;
     private final Executor exe;
     private final int queuedResponseLimit;
-    private final Map<Integer, ChannelBuffer> responseMap = new HashMap<Integer, ChannelBuffer>();
+    private final Map<Integer, ChannelBuffer> responseMap = new ConcurrentHashMap<>();
     private final AtomicInteger dispatcherSequenceId = new AtomicInteger(0);
     private final AtomicInteger lastResponseWrittenId = new AtomicInteger(0);
 
@@ -83,19 +83,16 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
         // responses.
         final int requestSequenceId = dispatcherSequenceId.incrementAndGet();
 
-        synchronized (responseMap)
+        // Limit the number of pending responses (responses which finished out of order, and are
+        // waiting for previous requests to be finished so they can be written in order), by
+        // blocking further channel reads. Due to the way Netty frame decoders work, this is more
+        // of an estimate than a hard limit. Netty may continue to decode and process several
+        // more requests that were in the latest read, even while further reads on the channel
+        // have been blocked.
+        if ((requestSequenceId > lastResponseWrittenId.get() + queuedResponseLimit) &&
+            !isChannelReadBlocked(ctx))
         {
-            // Limit the number of pending responses (responses which finished out of order, and are
-            // waiting for previous requests to be finished so they can be written in order), by
-            // blocking further channel reads. Due to the way Netty frame decoders work, this is more
-            // of an estimate than a hard limit. Netty may continue to decode and process several
-            // more requests that were in the latest read, even while further reads on the channel
-            // have been blocked.
-            if ((requestSequenceId > lastResponseWrittenId.get() + queuedResponseLimit) &&
-                !isChannelReadBlocked(ctx))
-            {
-                blockChannelReads(ctx);
-            }
+            blockChannelReads(ctx);
         }
 
         exe.execute(new Runnable()
@@ -126,32 +123,30 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                                int responseSequenceId) {
         // Ensure responses to requests are written in the same order the requests
         // were received.
-        synchronized (responseMap) {
-            ChannelBuffer response = messageTransport.getOutputBuffer();
-            ThriftTransportType transportType = messageTransport.getTransportType();
-            int currentResponseId = lastResponseWrittenId.get() + 1;
-            if (responseSequenceId != currentResponseId) {
-                // This response is NOT next in line of ordered responses, save it to
-                // be sent later, after responses to all earlier requests have been
-                // sent.
-                responseMap.put(responseSequenceId, response);
-            } else {
-                // This response was next in line, write this response now, and see if
-                // there are others next in line that should be sent now as well.
-                do {
-                    response = addFraming(response, transportType);
-                    Channels.write(ctx.getChannel(), response);
-                    lastResponseWrittenId.incrementAndGet();
-                    ++currentResponseId;
-                    response = responseMap.remove(currentResponseId);
-                } while (null != response);
+        ChannelBuffer response = messageTransport.getOutputBuffer();
+        ThriftTransportType transportType = messageTransport.getTransportType();
+        int currentResponseId = lastResponseWrittenId.get() + 1;
+        if (responseSequenceId != currentResponseId) {
+            // This response is NOT next in line of ordered responses, save it to
+            // be sent later, after responses to all earlier requests have been
+            // sent.
+            responseMap.put(responseSequenceId, response);
+        } else {
+            // This response was next in line, write this response now, and see if
+            // there are others next in line that should be sent now as well.
+            do {
+                response = addFraming(response, transportType);
+                Channels.write(ctx.getChannel(), response);
+                lastResponseWrittenId.incrementAndGet();
+                ++currentResponseId;
+                response = responseMap.remove(currentResponseId);
+            } while (null != response);
 
-                // Now that we've written some responses, check if reads should be unblocked
-                if (isChannelReadBlocked(ctx)) {
-                    int lastRequestSequenceId = dispatcherSequenceId.get();
-                    if (lastRequestSequenceId <= lastResponseWrittenId.get() + queuedResponseLimit) {
-                        unblockChannelReads(ctx);
-                    }
+            // Now that we've written some responses, check if reads should be unblocked
+            if (isChannelReadBlocked(ctx)) {
+                int lastRequestSequenceId = dispatcherSequenceId.get();
+                if (lastRequestSequenceId <= lastResponseWrittenId.get() + queuedResponseLimit) {
+                    unblockChannelReads(ctx);
                 }
             }
         }
