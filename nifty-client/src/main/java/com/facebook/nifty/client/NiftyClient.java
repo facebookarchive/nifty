@@ -143,13 +143,6 @@ public class NiftyClient implements Closeable
                 if (channel != null && channel.isOpen()) {
                     // Add the channel to allChannels, and set it up to be removed when closed
                     allChannels.add(channel);
-                    channel.getCloseFuture().addListener(new ChannelFutureListener() {
-                        @Override
-                        public void operationComplete(ChannelFuture future) throws Exception {
-                            Channel channel = future.getChannel();
-                            allChannels.remove(channel);
-                        }
-                    });
                 }
             }
         });
@@ -206,13 +199,6 @@ public class NiftyClient implements Closeable
             if (channel.isOpen()) {
                 // Add the channel to allChannels, and set it up to be removed when closed
                 allChannels.add(channel);
-                channel.getCloseFuture().addListener(new ChannelFutureListener() {
-                    @Override
-                    public void operationComplete(ChannelFuture future) throws Exception {
-                        Channel channel = future.getChannel();
-                        allChannels.remove(channel);
-                    }
-                });
             }
 
             TNiftyClientTransport transport = new TNiftyClientTransport(channel, receiveTimeout);
