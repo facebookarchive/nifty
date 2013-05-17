@@ -15,6 +15,7 @@
  */
 package com.facebook.nifty.client;
 
+import com.facebook.nifty.duplex.TDuplexProtocolFactory;
 import io.airlift.units.Duration;
 import org.apache.thrift.TException;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -101,6 +102,8 @@ public interface NiftyClientChannel {
     void executeInIoThread(Runnable runnable);
 
     Channel getNettyChannel();
+
+    TDuplexProtocolFactory getProtocolFactory();
 
     public interface Listener {
         public abstract void onRequestSent();
