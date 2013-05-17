@@ -15,7 +15,9 @@
  */
 package com.facebook.nifty.client;
 
+import com.facebook.nifty.duplex.TDuplexProtocolFactory;
 import com.google.common.net.HostAndPort;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -43,23 +45,37 @@ public class FramedClientConnector extends AbstractClientConnector<FramedClientC
     // The client expects to see only the message *without* any framing, this strips it off
     private static final int INITIAL_BYTES_TO_STRIP = LENGTH_FIELD_LENGTH;
 
-    public FramedClientConnector(InetSocketAddress address) {
-        super(address);
+    public FramedClientConnector(InetSocketAddress address)
+    {
+        this(address, defaultProtocolFactory());
     }
 
-    public FramedClientConnector(HostAndPort address) {
-        super(address);
+    public FramedClientConnector(HostAndPort address)
+    {
+        this(address, defaultProtocolFactory());
+    }
+
+    public FramedClientConnector(InetSocketAddress address, TDuplexProtocolFactory protocolFactory)
+    {
+        super(address, protocolFactory);
+    }
+
+    public FramedClientConnector(HostAndPort address, TDuplexProtocolFactory protocolFactory)
+    {
+        super(toSocketAddress(address), protocolFactory);
     }
 
     @Override
-    public FramedClientChannel newThriftClientChannel(Channel nettyChannel, Timer timer) {
-        FramedClientChannel channel = new FramedClientChannel(nettyChannel, timer);
+    public FramedClientChannel newThriftClientChannel(Channel nettyChannel, Timer timer)
+    {
+        FramedClientChannel channel = new FramedClientChannel(nettyChannel, timer, getProtocolFactory());
         channel.getNettyChannel().getPipeline().addLast("thriftHandler", channel);
         return channel;
     }
 
     @Override
-    public ChannelPipelineFactory newChannelPipelineFactory(final int maxFrameSize) {
+    public ChannelPipelineFactory newChannelPipelineFactory(final int maxFrameSize)
+    {
         return new ChannelPipelineFactory() {
             @Override
             public ChannelPipeline getPipeline()
