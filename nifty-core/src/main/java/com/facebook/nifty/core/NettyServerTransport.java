@@ -33,6 +33,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A core channel the decode framed Thrift message, dispatches to the TProcessor given
@@ -158,24 +159,23 @@ public class NettyServerTransport implements ExternalResourceReleasable
 
     private class ConnectionLimiter extends SimpleChannelUpstreamHandler
     {
-        private int numConnections;
+        private final AtomicInteger numConnections;
         private final int maxConnections;
 
         public ConnectionLimiter(int maxConnections)
         {
             this.maxConnections = maxConnections;
-            this.numConnections = 0;
+            this.numConnections = new AtomicInteger(0);
         }
 
         @Override
         public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception
         {
             if (maxConnections > 0) {
-                if (numConnections >= maxConnections) {
-                    log.info("Accepted connection above limit ({}). Dropping.", maxConnections);
+                if (numConnections.incrementAndGet() > maxConnections) {
                     ctx.getChannel().close();
-                } else {
-                    numConnections++;
+                    numConnections.decrementAndGet();
+                    log.info("Accepted connection above limit ({}). Dropping.", maxConnections);
                 }
             }
             super.channelOpen(ctx, e);
@@ -185,7 +185,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
         public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception
         {
             if (maxConnections > 0) {
-                numConnections--;
+                numConnections.decrementAndGet();
             }
             super.channelClosed(ctx, e);
         }
