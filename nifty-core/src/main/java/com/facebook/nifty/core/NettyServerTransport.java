@@ -17,13 +17,7 @@ package com.facebook.nifty.core;
 
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.ServerChannelFactory;
+import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.timeout.IdleStateHandler;
@@ -67,6 +61,8 @@ public class NettyServerTransport implements ExternalResourceReleasable
         this.def = def;
         this.configBuilder = configBuilder;
         this.port = def.getServerPort();
+        // connectionLimiter must be instantiated exactly once (and thus outside the pipeline factory)
+        final ConnectionLimiter connectionLimiter = new ConnectionLimiter(def.getMaxConnections());
 
         this.pipelineFactory = new ChannelPipelineFactory()
         {
@@ -76,6 +72,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
             {
                 ChannelPipeline cp = Channels.pipeline();
                 TProtocolFactory inputProtocolFactory = def.getDuplexProtocolFactory().getInputProtocolFactory();
+                cp.addLast("connectionLimiter", connectionLimiter);
                 cp.addLast(ChannelStatistics.NAME, new ChannelStatistics(allChannels));
                 cp.addLast("frameCodec", def.getThriftFrameCodecFactory().create(def.getMaxFrameSize(),
                                                                                  inputProtocolFactory));
@@ -157,5 +154,40 @@ public class NettyServerTransport implements ExternalResourceReleasable
     public void releaseExternalResources()
     {
         bootstrap.releaseExternalResources();
+    }
+
+    private class ConnectionLimiter extends SimpleChannelUpstreamHandler
+    {
+        private int numConnections;
+        private final int maxConnections;
+
+        public ConnectionLimiter(int maxConnections)
+        {
+            this.maxConnections = maxConnections;
+            this.numConnections = 0;
+        }
+
+        @Override
+        public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception
+        {
+            if (maxConnections > 0) {
+                if (numConnections >= maxConnections) {
+                    log.info("Accepted connection above limit ({}). Dropping.", maxConnections);
+                    ctx.getChannel().close();
+                } else {
+                    numConnections++;
+                }
+            }
+            super.channelOpen(ctx, e);
+        }
+
+        @Override
+        public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception
+        {
+            if (maxConnections > 0) {
+                numConnections--;
+            }
+            super.channelClosed(ctx, e);
+        }
     }
 }
