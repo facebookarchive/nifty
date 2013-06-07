@@ -174,7 +174,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
             if (maxConnections > 0) {
                 if (numConnections.incrementAndGet() > maxConnections) {
                     ctx.getChannel().close();
-                    numConnections.decrementAndGet();
+                    // numConnections will be decremented in channelClosed
                     log.info("Accepted connection above limit ({}). Dropping.", maxConnections);
                 }
             }
@@ -185,7 +185,9 @@ public class NettyServerTransport implements ExternalResourceReleasable
         public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception
         {
             if (maxConnections > 0) {
-                numConnections.decrementAndGet();
+                if (numConnections.decrementAndGet() < 0) {
+                    log.error("BUG in ConnectionLimiter");
+                }
             }
             super.channelClosed(ctx, e);
         }

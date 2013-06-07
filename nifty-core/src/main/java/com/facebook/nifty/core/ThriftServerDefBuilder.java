@@ -230,6 +230,7 @@ public class ThriftServerDefBuilder
                    "Processor not defined!");
         checkState(niftyProcessorFactory == null || thriftProcessorFactory == null,
                    "TProcessors will be automatically adapted to NiftyProcessors, don't specify both");
+        checkState(maxConnections >= 0, "maxConnections should be 0 (for unlimited) or positive");
 
         if (niftyProcessorFactory == null)
         {
