@@ -24,7 +24,6 @@ import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Slf4JLoggerFactory;
 import org.jboss.netty.util.ExternalResourceReleasable;
-import org.jboss.netty.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,17 +49,16 @@ public class NettyServerTransport implements ExternalResourceReleasable
     private ServerBootstrap bootstrap;
     private Channel serverChannel;
     private final ThriftServerDef def;
-    private final NettyConfigBuilder configBuilder;
+    private final NettyServerConfig nettyServerConfig;
 
     @Inject
     public NettyServerTransport(
             final ThriftServerDef def,
-            NettyConfigBuilder configBuilder,
-            final ChannelGroup allChannels,
-            final Timer timer)
+            final NettyServerConfig nettyServerConfig,
+            final ChannelGroup allChannels)
     {
         this.def = def;
-        this.configBuilder = configBuilder;
+        this.nettyServerConfig = nettyServerConfig;
         this.port = def.getServerPort();
         // connectionLimiter must be instantiated exactly once (and thus outside the pipeline factory)
         final ConnectionLimiter connectionLimiter = new ConnectionLimiter(def.getMaxConnections());
@@ -79,7 +77,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
                                                                                  inputProtocolFactory));
                 if (def.getClientIdleTimeout() != null) {
                     // Add handlers to detect idle client connections and disconnect them
-                    cp.addLast("idleTimeoutHandler", new IdleStateHandler(timer,
+                    cp.addLast("idleTimeoutHandler", new IdleStateHandler(nettyServerConfig.getTimer(),
                                                                           (int) def.getClientIdleTimeout().toMillis(),
                                                                           NO_WRITER_IDLE_TIMEOUT,
                                                                           NO_ALL_IDLE_TIMEOUT,
@@ -96,12 +94,12 @@ public class NettyServerTransport implements ExternalResourceReleasable
 
     public void start()
     {
-        start(new NioServerSocketChannelFactory());
-    }
+        ExecutorService bossExecutor = nettyServerConfig.getBossExecutor();
+        int bossThreadCount = nettyServerConfig.getBossThreadCount();
+        ExecutorService workerExecutor = nettyServerConfig.getWorkerExecutor();
+        int workerThreadCount = nettyServerConfig.getWorkerThreadCount();
 
-    public void start(ExecutorService bossExecutor, ExecutorService ioWorkerExecutor)
-    {
-        start(new NioServerSocketChannelFactory(bossExecutor, ioWorkerExecutor));
+        start(new NioServerSocketChannelFactory(bossExecutor, bossThreadCount, workerExecutor, workerThreadCount));
     }
 
     public void start(ServerChannelFactory serverChannelFactory)
@@ -114,7 +112,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
         }
 
         bootstrap = new ServerBootstrap(serverChannelFactory);
-        bootstrap.setOptions(configBuilder.getOptions());
+        bootstrap.setOptions(nettyServerConfig.getBootstrapOptions());
         bootstrap.setPipelineFactory(pipelineFactory);
         log.info("starting transport {}:{}", def.getName(), port);
         serverChannel = bootstrap.bind(new InetSocketAddress(port));
