@@ -15,7 +15,8 @@ package com.facebook.nifty.core;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public interface NiftyMetrics {
+public interface NiftyMetrics
+{
     int getChannelCount();
     long getBytesRead();
     long getBytesWritten();

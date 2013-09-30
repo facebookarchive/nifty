@@ -240,7 +240,8 @@ public class NettyServerTransport implements ExternalResourceReleasable
         }
     }
 
-    public NiftyMetrics getMetrics() {
+    public NiftyMetrics getMetrics()
+    {
         return channelStatistics;
     }
 }
