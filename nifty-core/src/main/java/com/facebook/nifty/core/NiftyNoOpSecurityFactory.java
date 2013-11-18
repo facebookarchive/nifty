@@ -20,6 +20,8 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 
 public class NiftyNoOpSecurityFactory implements NiftySecurityFactory
 {
+    final ChannelHandler noOpHandler = new SimpleChannelHandler();
+
     @Override
     public NiftySecurityHandlers getSecurityHandlers(ThriftServerDef def)
     {
@@ -28,13 +30,13 @@ public class NiftyNoOpSecurityFactory implements NiftySecurityFactory
             @Override
             public ChannelHandler getAuthenticationHandler()
             {
-                return new SimpleChannelHandler();
+                return noOpHandler;
             }
 
             @Override
             public ChannelHandler getEncryptionHandler()
             {
-                return new SimpleChannelHandler();
+                return noOpHandler;
             }
         };
     }
