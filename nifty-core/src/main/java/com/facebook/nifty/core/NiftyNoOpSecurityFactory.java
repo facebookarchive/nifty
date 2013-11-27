@@ -16,11 +16,20 @@
 package com.facebook.nifty.core;
 
 import org.jboss.netty.channel.ChannelHandler;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
 public class NiftyNoOpSecurityFactory implements NiftySecurityFactory
 {
-    final ChannelHandler noOpHandler = new SimpleChannelHandler();
+    static final ChannelHandler noOpHandler = new SimpleChannelHandler() {
+        @Override
+        public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception
+        {
+            super.channelOpen(ctx, e);
+            ctx.getPipeline().remove(this);
+        }
+    };
 
     @Override
     public NiftySecurityHandlers getSecurityHandlers(ThriftServerDef def)
