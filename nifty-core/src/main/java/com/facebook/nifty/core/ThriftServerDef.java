@@ -28,6 +28,8 @@ import java.util.concurrent.Executor;
 public class ThriftServerDef
 {
     private final int serverPort;
+    private final int minServerPort;
+    private final int maxServerPort;
     private final int maxFrameSize;
     private final int maxConnections;
     private final int queuedResponseLimit;
@@ -44,6 +46,8 @@ public class ThriftServerDef
     public ThriftServerDef(
             String name,
             int serverPort,
+            int minServerPort,
+            int maxServerPort,
             int maxFrameSize,
             int queuedResponseLimit,
             int maxConnections,
@@ -56,6 +60,8 @@ public class ThriftServerDef
     {
         this.name = name;
         this.serverPort = serverPort;
+        this.minServerPort = minServerPort;
+        this.maxServerPort = maxServerPort;
         this.maxFrameSize = maxFrameSize;
         this.maxConnections = maxConnections;
         this.queuedResponseLimit = queuedResponseLimit;
@@ -75,6 +81,16 @@ public class ThriftServerDef
     public int getServerPort()
     {
         return serverPort;
+    }
+
+    public int getMinServerPort()
+    {
+        return minServerPort;
+    }
+
+    public int getMaxServerPort()
+    {
+        return maxServerPort;
     }
 
     public int getMaxFrameSize()

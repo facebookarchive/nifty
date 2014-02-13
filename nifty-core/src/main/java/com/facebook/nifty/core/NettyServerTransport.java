@@ -25,6 +25,7 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.ServerChannelFactory;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.group.ChannelGroup;
@@ -57,7 +58,10 @@ public class NettyServerTransport implements ExternalResourceReleasable
 {
     private static final Logger log = LoggerFactory.getLogger(NettyServerTransport.class);
 
-    private final int port;
+    private int port;
+    private final int defPort;
+    private final int minPort;
+    private final int maxPort;
     private final ChannelPipelineFactory pipelineFactory;
     private static final int NO_WRITER_IDLE_TIMEOUT = 0;
     private static final int NO_ALL_IDLE_TIMEOUT = 0;
@@ -84,7 +88,9 @@ public class NettyServerTransport implements ExternalResourceReleasable
     {
         this.def = def;
         this.nettyServerConfig = nettyServerConfig;
-        this.port = def.getServerPort();
+        this.defPort = def.getServerPort();
+        this.minPort = def.getMinServerPort();
+        this.maxPort = def.getMaxServerPort();
         this.allChannels = allChannels;
         // connectionLimiter must be instantiated exactly once (and thus outside the pipeline factory)
         final ConnectionLimiter connectionLimiter = new ConnectionLimiter(def.getMaxConnections());
@@ -147,7 +153,23 @@ public class NettyServerTransport implements ExternalResourceReleasable
         bootstrap = new ServerBootstrap(serverChannelFactory);
         bootstrap.setOptions(nettyServerConfig.getBootstrapOptions());
         bootstrap.setPipelineFactory(pipelineFactory);
-        serverChannel = bootstrap.bind(new InetSocketAddress(port));
+        if (defPort > 0) {
+            port = defPort;
+            serverChannel = bootstrap.bind(new InetSocketAddress(port));
+        } else {
+            boolean success = false;
+            for (port = minPort; port <= maxPort && !success; port++) {
+                success = true;
+                try {
+                    serverChannel = bootstrap.bind(new InetSocketAddress(port));
+                } catch (ChannelException e) {
+                    success = false;
+                }
+            }
+            if (!success) {
+                throw new ChannelException("Failed to bind to a range of ports: " + minPort + " - " + maxPort);
+            }
+        }
         SocketAddress actualSocket = serverChannel.getLocalAddress();
         if (actualSocket instanceof InetSocketAddress) {
             int actualPort = ((InetSocketAddress) actualSocket).getPort();
