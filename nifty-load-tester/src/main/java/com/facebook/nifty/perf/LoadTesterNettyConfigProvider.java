@@ -17,22 +17,16 @@ package com.facebook.nifty.perf;
 
 import com.facebook.nifty.core.NettyServerConfig;
 import com.facebook.nifty.core.NettyServerConfigBuilder;
-import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class LoadTesterNettyConfigProvider implements Provider<NettyServerConfig> {
-    private final NiftyLoadTester.LoadTesterConfig config;
-
-    @Inject
-    public LoadTesterNettyConfigProvider(NiftyLoadTester.LoadTesterConfig config)
-    {
-        this.config = config;
+    public LoadTesterNettyConfigProvider() {
     }
 
     @Override
     public NettyServerConfig get() {
         NettyServerConfigBuilder configBuilder = new NettyServerConfigBuilder();
-        configBuilder.getServerSocketChannelConfig().setBacklog(config.getAcceptBacklog());
+        configBuilder.getServerSocketChannelConfig().setBacklog(1024);
         return configBuilder.build();
     }
 }
