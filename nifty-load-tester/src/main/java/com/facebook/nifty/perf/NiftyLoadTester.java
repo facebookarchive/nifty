@@ -119,6 +119,7 @@ public class NiftyLoadTester
         private boolean useTaskQueue = false;
         private int numTaskThreads = 8;
         private int queuedResponseLimit = 500;
+        private int acceptBacklog = 1024;
         private int numBossThreads = NettyConfigBuilderBase.DEFAULT_BOSS_THREAD_COUNT;
         private int numIoThreads = NettyConfigBuilderBase.DEFAULT_WORKER_THREAD_COUNT;
 
@@ -179,6 +180,17 @@ public class NiftyLoadTester
         public void setQueuedResponseLimit(int queuedResponseLimit)
         {
             this.queuedResponseLimit = queuedResponseLimit;
+        }
+
+        public int getAcceptBacklog()
+        {
+            return acceptBacklog;
+        }
+
+        @Config("acceptBacklog")
+        public void setAcceptBacklog(int acceptBacklog)
+        {
+            this.acceptBacklog = acceptBacklog;
         }
 
         @Min(1)
