@@ -15,13 +15,22 @@
  */
 package com.facebook.nifty.core;
 
-import org.apache.thrift.protocol.TProtocol;
+import java.net.SocketAddress;
+import java.util.Map;
 
-public interface RequestContext
+public interface ConnectionContext
 {
-    TProtocol getOutputProtocol();
+    /**
+     * Gets the remote address of the client that made the request
+     *
+     * @return The client's remote address as a {@link SocketAddress}
+     */
+    public SocketAddress getRemoteAddress();
 
-    TProtocol getInputProtocol();
-
-    ConnectionContext getConnectionContext();
+    /**
+     * Gets a map of additional attributes specific to the connection
+     *
+     * @return Map of additional attributes
+     */
+    public Map<String, Object> getAttributes();
 }
