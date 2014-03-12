@@ -15,13 +15,29 @@
  */
 package com.facebook.nifty.core;
 
-import org.apache.thrift.protocol.TProtocol;
+import java.net.SocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public interface RequestContext
+public class NiftyConnectionContext implements ConnectionContext
 {
-    TProtocol getOutputProtocol();
+    private SocketAddress remoteAddress;
+    private Map<String, Object> attributes = new ConcurrentHashMap<>();
 
-    TProtocol getInputProtocol();
+    @Override
+    public SocketAddress getRemoteAddress()
+    {
+        return remoteAddress;
+    }
 
-    ConnectionContext getConnectionContext();
+    public void setRemoteAddress(SocketAddress remoteAddress)
+    {
+        this.remoteAddress = remoteAddress;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes()
+    {
+        return attributes;
+    }
 }
