@@ -19,25 +19,25 @@
 <FindBugsFilter>
     <!-- nifty-examples excludes -->
     <Match>
-        <Class name="com.facebook.nifty.test.scribe"/>
+        <Class name="com.facebook.nifty.legacy.test.scribe"/>
     </Match>
     <Match>
-        <Class name="~com\.facebook\.nifty\.test\.scribe\$.*"/>
+        <Class name="~com\.facebook\.nifty\.legacy\.test\.scribe\$.*"/>
     </Match>
     <Match>
-        <Class name="com.facebook.nifty.test.LogEntry"/>
+        <Class name="com.facebook.nifty.legacy.test.LogEntry"/>
     </Match>
     <Match>
-        <Class name="com.facebook.nifty.test.ResultCode"/>
+        <Class name="com.facebook.nifty.legacy.test.ResultCode"/>
     </Match>
     <!-- nifty-load-tester excludes -->
     <Match>
-        <Class name="com.facebook.nifty.perf.LoadTest"/>
+        <Class name="com.facebook.nifty.legacy.perf.LoadTest"/>
     </Match>
     <Match>
-        <Class name="com.facebook.nifty.perf.LoadError"/>
+        <Class name="com.facebook.nifty.legacy.perf.LoadError"/>
     </Match>
     <Match>
-        <Class name="~com\.facebook\.nifty\.perf\.LoadTest\$.*"/>
+        <Class name="~com\.facebook\.nifty\.legacy\.perf\.LoadTest\$.*"/>
     </Match>
 </FindBugsFilter>

@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.facebook.nifty</groupId>
+        <groupId>com.facebook.nifty.legacy</groupId>
         <artifactId>nifty-parent</artifactId>
         <version>0.15.0-SNAPSHOT</version>
     </parent>
@@ -35,7 +35,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.facebook.nifty</groupId>
+            <groupId>com.facebook.nifty.legacy</groupId>
             <artifactId>nifty-core</artifactId>
         </dependency>
 
@@ -77,7 +77,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.facebook.nifty</groupId>
+            <groupId>com.facebook.nifty.legacy</groupId>
             <artifactId>nifty-client</artifactId>
             <scope>test</scope>
         </dependency>
@@ -88,11 +88,11 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>io.airlift</groupId>
-            <artifactId>units</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>io.airlift</groupId>-->
+            <!--<artifactId>units</artifactId>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.testng</groupId>

@@ -1,4 +1,4 @@
-namespace java com.facebook.nifty.perf
+namespace java com.facebook.nifty.legacy.perf
 
 exception LoadError {
   1: i32 code

@@ -17,7 +17,7 @@
 ## See accompanying file LICENSE or visit the Scribe site at:
 ## http://developers.facebook.com/scribe/
 
-namespace java com.facebook.nifty.test
+namespace java com.facebook.nifty.legacy.test
 
 enum ResultCode
 {

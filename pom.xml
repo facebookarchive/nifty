@@ -25,7 +25,7 @@
         <version>11</version>
     </parent>
 
-    <groupId>com.facebook.nifty</groupId>
+    <groupId>com.facebook.nifty.legacy</groupId>
     <artifactId>nifty-parent</artifactId>
     <version>0.15.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -33,16 +33,13 @@
     <modules>
         <module>nifty-core</module>
         <module>nifty-client</module>
-        <module>nifty-examples</module>
-        <module>nifty-load-tester</module>
+        <!--<module>nifty-examples</module>-->
+        <!--<module>nifty-load-tester</module>-->
     </modules>
 
     <properties>
-        <!-- Nifty actually can not build with the 1.6 compiler because -->
-        <!-- it dependends on airlift, which is 1.7 only.               -->
-        <!-- <project.build.targetJdk>1.6</project.build.targetJdk>     -->
-
-        <dep.airlift.version>0.91</dep.airlift.version>
+        <!--<dep.airlift.version>0.83</dep.airlift.version>-->
+        <dep.guava.version>14.0.1</dep.guava.version>
     </properties>
 
     <url>https://facebook.github.com/nifty</url>
@@ -59,6 +56,11 @@
             <name>Andrew Cox</name>
             <email>andrewcox@fb.com</email>
         </developer>
+        <developer>
+            <id>wdong</id>
+            <name>Wenlong Dong</name>
+            <email>wdong@fb.com</email>
+        </developer>
     </developers>
 
     <scm>
@@ -69,39 +71,92 @@
     </scm>
 
     <distributionManagement>
-        <site>
-            <id>github-project-site</id>
-            <url>gitsite:git@github.com/facebook/nifty.git</url>
-        </site>
+        <repository>
+            <id>fb-nexus-releases</id>
+            <name>Facebook Nexus Releases</name>
+            <url>http://nexus.vip.facebook.com:8181/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>fb-nexus-snapshots</id>
+            <name>Facebook Nexus Snapshots</name>
+            <url>http://nexus.vip.facebook.com:8181/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
+
+    <organization>
+        <name>Facebook, Inc.</name>
+        <url>https://www.facebook.com/</url>
+    </organization>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.facebook.nifty</groupId>
+                <groupId>com.facebook.nifty.legacy</groupId>
                 <artifactId>nifty-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.facebook.nifty</groupId>
+                <groupId>com.facebook.nifty.legacy</groupId>
                 <artifactId>nifty-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.facebook.nifty</groupId>
+                <groupId>com.facebook.nifty.legacy</groupId>
                 <artifactId>nifty-examples</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.facebook.nifty</groupId>
+                <groupId>com.facebook.nifty.legacy</groupId>
                 <artifactId>nifty-load-tester</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${dep.guava.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>3.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-multibindings</artifactId>
+                <version>3.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>annotations</artifactId>
+                <version>2.0.2</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.apache.thrift</groupId>
                 <artifactId>libthrift</artifactId>
-                <version>0.9.1</version>
+                <version>0.7.0</version>
             </dependency>
 
             <dependency>
@@ -122,34 +177,47 @@
                 <version>4.2.4</version>
             </dependency>
 
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>units</artifactId>
-                <version>${dep.airlift.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>io.airlift</groupId>-->
+                <!--<artifactId>units</artifactId>-->
+                <!--<version>${dep.airlift.version}</version>-->
+            <!--</dependency>-->
 
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>bootstrap</artifactId>
-                <version>${dep.airlift.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>jsr305</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>io.airlift</groupId>-->
+                <!--<artifactId>bootstrap</artifactId>-->
+                <!--<version>${dep.airlift.version}</version>-->
+                <!--<exclusions>-->
+                    <!--<exclusion>-->
+                        <!--<groupId>com.google.code.findbugs</groupId>-->
+                        <!--<artifactId>jsr305</artifactId>-->
+                    <!--</exclusion>-->
+                <!--</exclusions>-->
+            <!--</dependency>-->
 
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>configuration</artifactId>
-                <version>${dep.airlift.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>io.airlift</groupId>-->
+                <!--<artifactId>configuration</artifactId>-->
+                <!--<version>${dep.airlift.version}</version>-->
+            <!--</dependency>-->
 
             <dependency>
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
                 <version>1.1.0.Final</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>3.2</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>6.6</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
