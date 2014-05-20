@@ -43,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jboss.netty.util.Timer;
 import org.jboss.netty.util.Timeout;
 import org.jboss.netty.util.TimerTask;
 
@@ -61,21 +62,21 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
     private final NiftyProcessorFactory processorFactory;
     private final Executor exe;
     private final long taskTimeoutMillis;
-    private final NiftyTimer taskTimeoutTimer;
+    private final Timer taskTimeoutTimer;
     private final int queuedResponseLimit;
     private final Map<Integer, ThriftMessage> responseMap = new HashMap<>();
     private final AtomicInteger dispatcherSequenceId = new AtomicInteger(0);
     private final AtomicInteger lastResponseWrittenId = new AtomicInteger(0);
     private final TDuplexProtocolFactory duplexProtocolFactory;
 
-    public NiftyDispatcher(ThriftServerDef def)
+    public NiftyDispatcher(ThriftServerDef def, Timer timer)
     {
         this.processorFactory = def.getProcessorFactory();
         this.duplexProtocolFactory = def.getDuplexProtocolFactory();
         this.queuedResponseLimit = def.getQueuedResponseLimit();
         this.exe = def.getExecutor();
-        this.taskTimeoutMillis = (def.getTaskTimeout() == null ? -1L : def.getTaskTimeout().toMillis());
-        this.taskTimeoutTimer = (def.getTaskTimeout() == null ? null : new NiftyTimer("task-timeout"));
+        this.taskTimeoutMillis = (def.getTaskTimeout() == null ? 0 : def.getTaskTimeout().toMillis());
+        this.taskTimeoutTimer = (def.getTaskTimeout() == null ? null : timer);
     }
 
     @Override
@@ -162,7 +163,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
 
                 try {
                     try {
-                        long timeRemaining = -1L;
+                        long timeRemaining = 0;
                         if (taskTimeoutMillis > 0) {
                             long timeElapsed = System.currentTimeMillis() - message.getProcessStartTimeMillis();
                             if (timeElapsed >= taskTimeoutMillis) {
@@ -171,10 +172,8 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                                         "Task stayed on the queue for " + timeElapsed +
                                         " milliseconds, exceeding configured task timeout of " + taskTimeoutMillis +
                                         " milliseconds.");
-                                if (ctx.getChannel().isConnected()) {
-                                    sendTApplicationException(taskTimeoutException, ctx, message, messageTransport,
-                                            inProtocol, outProtocol);
-                                }
+                                sendTApplicationException(taskTimeoutException, ctx, message, messageTransport,
+                                        inProtocol, outProtocol);
                                 return;
                             } else {
                                 timeRemaining = taskTimeoutMillis - timeElapsed;
@@ -188,6 +187,22 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                                     // The immediateFuture returned by processors isn't cancellable, cancel() and
                                     // isCanceled() always return false. Use a flag to detect task expiration.
                                     taskTimeoutExpired.set(true);
+                                    TApplicationException ex = new TApplicationException(
+                                            TApplicationException.INTERNAL_ERROR,
+                                            "Task timed out while executing."
+                                    );
+                                    // Create a temporary transport to send the exception
+                                    ChannelBuffer duplicateBuffer = message.getBuffer().duplicate();
+                                    duplicateBuffer.resetReaderIndex();
+                                    TNiftyTransport temporaryTransport = new TNiftyTransport(
+                                            ctx.getChannel(),
+                                            duplicateBuffer,
+                                            message.getTransportType());
+                                    TProtocolPair protocolPair = duplexProtocolFactory.getProtocolPair(
+                                            TTransportPair.fromSingleTransport(temporaryTransport));
+                                    sendTApplicationException(ex, ctx, message, temporaryTransport,
+                                            protocolPair.getInputProtocol(),
+                                            protocolPair.getOutputProtocol());
                                 }
                             }, timeRemaining, TimeUnit.MILLISECONDS);
                         }
@@ -214,32 +229,13 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                                 public void onSuccess(Boolean result)
                                 {
                                     try {
-                                        // Only write response if the client is still there
-                                        if (ctx.getChannel().isConnected()) {
-                                            if (taskTimeoutExpired.get()) {
-                                                TApplicationException ex = new TApplicationException(
-                                                        TApplicationException.INTERNAL_ERROR,
-                                                        "Task timed out while executing."
-                                                );
-                                                // Create a temporary transport to send the exception
-                                                ChannelBuffer duplicateBuffer = message.getBuffer().duplicate();
-                                                duplicateBuffer.resetReaderIndex();
-                                                TNiftyTransport temporaryTransport = new TNiftyTransport(
-                                                        ctx.getChannel(),
-                                                        duplicateBuffer,
-                                                        message.getTransportType());
-                                                TProtocolPair protocolPair = duplexProtocolFactory.getProtocolPair(
-                                                        TTransportPair.fromSingleTransport(temporaryTransport));
-                                                sendTApplicationException(ex, ctx, message, temporaryTransport,
-                                                        protocolPair.getInputProtocol(),
-                                                        protocolPair.getOutputProtocol());
-                                            } else {
-                                                ThriftMessage response = message.getMessageFactory().create(
-                                                        messageTransport.getOutputBuffer());
-                                                writeResponse(ctx, response, requestSequenceId,
-                                                        DispatcherContext.isResponseOrderingRequired(ctx));
-                                            }
-
+                                        // Only write response if the client is still there and the task timeout
+                                        // hasn't expired.
+                                        if (ctx.getChannel().isConnected() && !taskTimeoutExpired.get()) {
+                                            ThriftMessage response = message.getMessageFactory().create(
+                                                    messageTransport.getOutputBuffer());
+                                            writeResponse(ctx, response, requestSequenceId,
+                                                    DispatcherContext.isResponseOrderingRequired(ctx));
                                         }
                                     }
                                     catch (Throwable t) {
@@ -269,18 +265,20 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
             TProtocol inProtocol,
             TProtocol outProtocol)
     {
-        try {
-            TMessage message = inProtocol.readMessageBegin();
-            outProtocol.writeMessageBegin(new TMessage(message.name, TMessageType.EXCEPTION, message.seqid));
-            x.write(outProtocol);
-            outProtocol.writeMessageEnd();
-            outProtocol.getTransport().flush();
+        if (ctx.getChannel().isConnected()) {
+            try {
+                TMessage message = inProtocol.readMessageBegin();
+                outProtocol.writeMessageBegin(new TMessage(message.name, TMessageType.EXCEPTION, message.seqid));
+                x.write(outProtocol);
+                outProtocol.writeMessageEnd();
+                outProtocol.getTransport().flush();
 
-            ThriftMessage response = request.getMessageFactory().create(requestTransport.getOutputBuffer());
-            writeResponse(ctx, response, message.seqid, DispatcherContext.isResponseOrderingRequired(ctx));
-        }
-        catch (TException ex) {
-            onDispatchException(ctx, ex);
+                ThriftMessage response = request.getMessageFactory().create(requestTransport.getOutputBuffer());
+                writeResponse(ctx, response, message.seqid, DispatcherContext.isResponseOrderingRequired(ctx));
+            }
+            catch (TException ex) {
+                onDispatchException(ctx, ex);
+            }
         }
     }
 
