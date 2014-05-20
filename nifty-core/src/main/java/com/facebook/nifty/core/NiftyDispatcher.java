@@ -159,7 +159,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
             public void run()
             {
                 ListenableFuture<Boolean> processFuture;
-                final AtomicBoolean taskTimeoutExpired = new AtomicBoolean(false);
+                final AtomicBoolean responseSent = new AtomicBoolean(false);
 
                 try {
                     try {
@@ -186,23 +186,24 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                                 public void run(Timeout timeout) throws Exception {
                                     // The immediateFuture returned by processors isn't cancellable, cancel() and
                                     // isCanceled() always return false. Use a flag to detect task expiration.
-                                    taskTimeoutExpired.set(true);
-                                    TApplicationException ex = new TApplicationException(
-                                            TApplicationException.INTERNAL_ERROR,
-                                            "Task timed out while executing."
-                                    );
-                                    // Create a temporary transport to send the exception
-                                    ChannelBuffer duplicateBuffer = message.getBuffer().duplicate();
-                                    duplicateBuffer.resetReaderIndex();
-                                    TNiftyTransport temporaryTransport = new TNiftyTransport(
-                                            ctx.getChannel(),
-                                            duplicateBuffer,
-                                            message.getTransportType());
-                                    TProtocolPair protocolPair = duplexProtocolFactory.getProtocolPair(
-                                            TTransportPair.fromSingleTransport(temporaryTransport));
-                                    sendTApplicationException(ex, ctx, message, temporaryTransport,
-                                            protocolPair.getInputProtocol(),
-                                            protocolPair.getOutputProtocol());
+                                    if(responseSent.compareAndSet(false, true)) {
+                                        TApplicationException ex = new TApplicationException(
+                                                TApplicationException.INTERNAL_ERROR,
+                                                "Task timed out while executing."
+                                        );
+                                        // Create a temporary transport to send the exception
+                                        ChannelBuffer duplicateBuffer = message.getBuffer().duplicate();
+                                        duplicateBuffer.resetReaderIndex();
+                                        TNiftyTransport temporaryTransport = new TNiftyTransport(
+                                                ctx.getChannel(),
+                                                duplicateBuffer,
+                                                message.getTransportType());
+                                        TProtocolPair protocolPair = duplexProtocolFactory.getProtocolPair(
+                                                TTransportPair.fromSingleTransport(temporaryTransport));
+                                        sendTApplicationException(ex, ctx, message, temporaryTransport,
+                                                protocolPair.getInputProtocol(),
+                                                protocolPair.getOutputProtocol());
+                                    }
                                 }
                             }, timeRemaining, TimeUnit.MILLISECONDS);
                         }
@@ -231,7 +232,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                                     try {
                                         // Only write response if the client is still there and the task timeout
                                         // hasn't expired.
-                                        if (ctx.getChannel().isConnected() && !taskTimeoutExpired.get()) {
+                                        if (ctx.getChannel().isConnected() && responseSent.compareAndSet(false, true)) {
                                             ThriftMessage response = message.getMessageFactory().create(
                                                     messageTransport.getOutputBuffer());
                                             writeResponse(ctx, response, requestSequenceId,
