@@ -50,9 +50,13 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public abstract class ThriftServerDefBuilderBase<T extends ThriftServerDefBuilderBase<T>>
 {
+    public static final int DEFAULT_SERVER_PORT = 8080;
+
     private static final AtomicInteger ID = new AtomicInteger(1);
     private ThriftFrameCodecFactory thriftFrameCodecFactory;
     private int serverPort;
+    private int minServerPort;
+    private int maxServerPort;
     private int maxFrameSize;
     private int maxConnections;
     private int queuedResponseLimit;
@@ -78,7 +82,6 @@ public abstract class ThriftServerDefBuilderBase<T extends ThriftServerDefBuilde
      */
     public ThriftServerDefBuilderBase()
     {
-        this.serverPort = 8080;
         this.maxFrameSize = MAX_FRAME_SIZE;
         this.maxConnections = 0;
         this.queuedResponseLimit = 16;
@@ -111,6 +114,17 @@ public abstract class ThriftServerDefBuilderBase<T extends ThriftServerDefBuilde
     public T listen(int serverPort)
     {
         this.serverPort = serverPort;
+        return (T) this;
+    }
+
+    /**
+     * Listen to a range of ports.
+     */
+    public T listen(int minPort, int maxPort)
+    {
+        checkState(minPort <= maxPort, "minPort should be less or equal to maxPort.");
+        this.minServerPort = minPort;
+        this.maxServerPort = maxPort;
         return (T) this;
     }
 
@@ -239,23 +253,47 @@ public abstract class ThriftServerDefBuilderBase<T extends ThriftServerDefBuilde
         checkState(niftyProcessorFactory == null || thriftProcessorFactory == null,
                    "TProcessors will be automatically adapted to NiftyProcessors, don't specify both");
         checkState(maxConnections >= 0, "maxConnections should be 0 (for unlimited) or positive");
+        checkState(serverPort == 0 || (minServerPort == 0 && maxServerPort == 0), "Please do not set port and min/maxPort together.");
+        checkState(!((minServerPort == 0) ^ (maxServerPort == 0)), "If min/maxPort is set, the other one should also be set.");
+        if (serverPort == 0 && minServerPort == 0) {
+            serverPort = DEFAULT_SERVER_PORT;
+        }
 
         if (niftyProcessorFactory == null)
         {
             niftyProcessorFactory = factoryFromTProcessorFactory(thriftProcessorFactory);
         }
 
-        return new ThriftServerDef(
-                name,
-                serverPort,
-                maxFrameSize,
-                queuedResponseLimit,
-                maxConnections,
-                niftyProcessorFactory,
-                duplexProtocolFactory,
-                clientIdleTimeout,
-                thriftFrameCodecFactory,
-                executor,
-                securityFactory);
+        if (serverPort > 0) {
+            return new ThriftServerDef(
+                    name,
+                    serverPort,
+                    0,
+                    0,
+                    maxFrameSize,
+                    queuedResponseLimit,
+                    maxConnections,
+                    niftyProcessorFactory,
+                    duplexProtocolFactory,
+                    clientIdleTimeout,
+                    thriftFrameCodecFactory,
+                    executor,
+                    securityFactory);
+        } else {
+            return new ThriftServerDef(
+                    name,
+                    0,
+                    minServerPort,
+                    maxServerPort,
+                    maxFrameSize,
+                    queuedResponseLimit,
+                    maxConnections,
+                    niftyProcessorFactory,
+                    duplexProtocolFactory,
+                    clientIdleTimeout,
+                    thriftFrameCodecFactory,
+                    executor,
+                    securityFactory);
+        }
     }
 }
