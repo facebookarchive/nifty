@@ -17,25 +17,9 @@ package com.facebook.nifty.core;
 
 import org.apache.thrift.protocol.TProtocol;
 
-public class NiftyClientRequestContext implements ClientRequestContext{
-    private final TProtocol inputProtocol;
-    private final TProtocol outputProtocol;
+public interface ClientRequestContext
+{
+    TProtocol getOutputProtocol();
 
-    public NiftyClientRequestContext(TProtocol inputProtocol, TProtocol outputProtocol)
-    {
-        this.inputProtocol = inputProtocol;
-        this.outputProtocol = outputProtocol;
-    }
-
-    @Override
-    public TProtocol getOutputProtocol()
-    {
-        return outputProtocol;
-    }
-
-    @Override
-    public TProtocol getInputProtocol()
-    {
-        return inputProtocol;
-    }
+    TProtocol getInputProtocol();
 }
