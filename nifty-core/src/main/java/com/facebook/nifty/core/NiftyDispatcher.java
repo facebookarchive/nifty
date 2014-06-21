@@ -91,13 +91,15 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
             }
             checkResponseOrderingRequirements(ctx, message);
 
+            DispatcherContext.setupTransportBuffersForRequest(ctx, message, duplexProtocolFactory);
+
             try {
                 processRequest(ctx, message);
             }
             catch (RejectedExecutionException ex) {
                 TApplicationException x = new TApplicationException(TApplicationException.INTERNAL_ERROR,
                         "Server overloaded");
-                sendTApplicationException(x, ctx, duplexProtocolFactory, message);
+                sendTApplicationException(x, ctx, message);
             }
         }
         else {
@@ -153,7 +155,6 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                 ListenableFuture<Boolean> processFuture;
                 final AtomicBoolean responseSent = new AtomicBoolean(false);
 
-                DispatcherContext.setupTransportBuffersForRequest(ctx, message, duplexProtocolFactory);
                 final TTransportPair transportPair = DispatcherContext.getTransportPair(ctx);
                 TProtocolPair protocolPair = DispatcherContext.getProtocolPair(ctx);
 
@@ -168,7 +169,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                                         "Task stayed on the queue for " + timeElapsed +
                                         " milliseconds, exceeding configured task timeout of " + taskTimeoutMillis +
                                         " milliseconds.");
-                                sendTApplicationException(taskTimeoutException, ctx, duplexProtocolFactory, message);
+                                sendTApplicationException(taskTimeoutException, ctx, message);
                                 return;
                             } else {
                                 timeRemaining = taskTimeoutMillis - timeElapsed;
@@ -186,16 +187,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                                                 TApplicationException.INTERNAL_ERROR,
                                                 "Task timed out while executing."
                                         );
-                                        // Create a temporary transport to send the exception
-                                        ChannelBuffer duplicateBuffer = message.getBuffer().duplicate();
-                                        duplicateBuffer.resetReaderIndex();
-                                        TNiftyTransport temporaryTransport = new TNiftyTransport(
-                                                ctx.getChannel(),
-                                                duplicateBuffer,
-                                                message.getTransportType());
-                                        TProtocolPair protocolPair = duplexProtocolFactory.getProtocolPair(
-                                                TTransportPair.fromSingleTransport(temporaryTransport));
-                                        sendTApplicationException(ex, ctx, duplexProtocolFactory, message);
+                                        sendTApplicationException(ex, ctx, message);
                                     }
                                 }
                             }, timeRemaining, TimeUnit.MILLISECONDS);
@@ -257,7 +249,6 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
     private void sendTApplicationException(
             TApplicationException x,
             ChannelHandlerContext ctx,
-            TDuplexProtocolFactory protocolFactory,
             ThriftMessage request)
     {
         if (ctx.getChannel().isConnected()) {
@@ -265,11 +256,13 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                 ChannelBuffer duplicatedRequestBuffer = request.getBuffer().duplicate();
                 duplicatedRequestBuffer.resetReaderIndex();
 
-                TChannelBufferInputTransport inputTransport = new TChannelBufferInputTransport(duplicatedRequestBuffer);
-                TChannelBufferOutputTransport outputTransport = new TChannelBufferOutputTransport();
-                TTransportPair transportPair = TTransportPair.fromSeparateTransports(inputTransport, outputTransport);
+                TTransportPair transportPair = DispatcherContext.getTransportPair(ctx);
+                TProtocolPair protocolPair = DispatcherContext.getProtocolPair(ctx);
 
-                TProtocolPair protocolPair = protocolFactory.getProtocolPair(transportPair);
+                TChannelBufferInputTransport inputTransport = (TChannelBufferInputTransport) transportPair.getInputTransport();
+                TChannelBufferOutputTransport outputTransport = (TChannelBufferOutputTransport) transportPair.getOutputTransport();
+                inputTransport.setInputBuffer(duplicatedRequestBuffer);
+
                 TProtocol outputProtocol = protocolPair.getOutputProtocol();
                 TProtocol inputProtocol = protocolPair.getInputProtocol();
 
