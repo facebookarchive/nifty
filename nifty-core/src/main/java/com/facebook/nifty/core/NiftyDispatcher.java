@@ -102,7 +102,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
             catch (RejectedExecutionException ex) {
                 TApplicationException x = new TApplicationException(TApplicationException.INTERNAL_ERROR,
                         "Server overloaded");
-                sendTApplicationException(x, ctx, message, messageTransport, inProtocol, outProtocol);
+                sendTApplicationException(x, ctx, message, dispatcherSequenceId.get(), messageTransport, inProtocol, outProtocol);
             }
         }
         else {
@@ -172,7 +172,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                                         "Task stayed on the queue for " + timeElapsed +
                                         " milliseconds, exceeding configured task timeout of " + taskTimeoutMillis +
                                         " milliseconds.");
-                                sendTApplicationException(taskTimeoutException, ctx, message, messageTransport,
+                                sendTApplicationException(taskTimeoutException, ctx, message, requestSequenceId, messageTransport,
                                         inProtocol, outProtocol);
                                 return;
                             } else {
@@ -200,7 +200,9 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                                                 message.getTransportType());
                                         TProtocolPair protocolPair = duplexProtocolFactory.getProtocolPair(
                                                 TTransportPair.fromSingleTransport(temporaryTransport));
-                                        sendTApplicationException(ex, ctx, message, temporaryTransport,
+                                        sendTApplicationException(ex, ctx, message,
+                                                requestSequenceId,
+                                                temporaryTransport,
                                                 protocolPair.getInputProtocol(),
                                                 protocolPair.getOutputProtocol());
                                     }
@@ -262,6 +264,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
             TApplicationException x,
             ChannelHandlerContext ctx,
             ThriftMessage request,
+            int responseSequenceId,
             TNiftyTransport requestTransport,
             TProtocol inProtocol,
             TProtocol outProtocol)
@@ -275,7 +278,7 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
                 outProtocol.getTransport().flush();
 
                 ThriftMessage response = request.getMessageFactory().create(requestTransport.getOutputBuffer());
-                writeResponse(ctx, response, message.seqid, DispatcherContext.isResponseOrderingRequired(ctx));
+                writeResponse(ctx, response, responseSequenceId, DispatcherContext.isResponseOrderingRequired(ctx));
             }
             catch (TException ex) {
                 onDispatchException(ctx, ex);
