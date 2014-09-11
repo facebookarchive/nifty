@@ -24,4 +24,10 @@ public interface RequestContext
     TProtocol getInputProtocol();
 
     ConnectionContext getConnectionContext();
+
+    void setContextData(String key, Object val);
+
+    Object getContextData(String key);
+
+    void clearContextData(String key);
 }
