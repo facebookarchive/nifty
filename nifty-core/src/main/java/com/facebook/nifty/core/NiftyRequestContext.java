@@ -19,6 +19,9 @@ import com.google.common.collect.Maps;
 import org.apache.thrift.protocol.TProtocol;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 public class NiftyRequestContext implements RequestContext
@@ -71,6 +74,12 @@ public class NiftyRequestContext implements RequestContext
     {
         checkNotNull(key, "context data key is null");
         data.remove(key);
+    }
+
+    @Override
+    public Iterator<Map.Entry<String, Object>> contextDataIterator()
+    {
+        return Collections.unmodifiableSet(data.entrySet()).iterator();
     }
 
     NiftyRequestContext(ConnectionContext connectionContext, TProtocol inputProtocol, TProtocol outputProtocol, TNiftyTransport niftyTransport)
