@@ -15,8 +15,14 @@
  */
 package com.facebook.nifty.core;
 
+import com.google.common.collect.ImmutableMap;
+
+import java.util.Map;
+
 public class RequestContexts
 {
+    private static final String REQUEST_SUCCEEDED = "request_succeeded";
+    private static final String TRACING_INFO = "tracing_info";
     private static ThreadLocal<RequestContext> threadLocalContext = new ThreadLocal<>();
 
     private RequestContexts()
@@ -56,5 +62,67 @@ public class RequestContexts
     public static void clearCurrentContext()
     {
         threadLocalContext.remove();
+    }
+
+    /**
+     * Convenient getter/setter/clearer methods for request succeeded.
+     */
+    public static boolean getRequestSucceeded() {
+        RequestContext currentContext = getCurrentContext();
+        if (currentContext == null || currentContext.getContextData(REQUEST_SUCCEEDED) == null) {
+            // Default to true if this isn't set explicitly
+            return true;
+        }
+
+        return ((Boolean)currentContext.getContextData(REQUEST_SUCCEEDED)).booleanValue();
+    }
+
+    public static void setRequestSucceeded(boolean succeeded) {
+        RequestContext currentContext = getCurrentContext();
+        if (currentContext == null) {
+            return;
+        }
+
+        currentContext.setContextData(REQUEST_SUCCEEDED, Boolean.valueOf(succeeded));
+    }
+
+    public static void clearRequestSucceeded() {
+        RequestContext currentContext = getCurrentContext();
+        if (currentContext == null) {
+            return;
+        }
+
+        currentContext.clearContextData(REQUEST_SUCCEEDED);
+    }
+
+    /**
+     * Convenient getter/setter/clearer methods for application tracing info.
+     */
+
+    public static Map<String, String> getTracingInfo() {
+        RequestContext currentContext = getCurrentContext();
+        if (currentContext == null || currentContext.getContextData(TRACING_INFO) == null) {
+            return ImmutableMap.of();
+        }
+
+        return (Map<String, String>)currentContext.getContextData(TRACING_INFO);
+    }
+
+    public static void setTracingInfo(Map<String, String> tracingInfo) {
+        RequestContext currentContext = getCurrentContext();
+        if (currentContext == null) {
+            return;
+        }
+
+        currentContext.setContextData(TRACING_INFO, tracingInfo);
+    }
+
+    public static void clearTracingInfo() {
+        RequestContext currentContext = getCurrentContext();
+        if (currentContext == null) {
+            return;
+        }
+
+        currentContext.clearContextData(TRACING_INFO);
     }
 }
