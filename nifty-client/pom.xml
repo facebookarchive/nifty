@@ -31,8 +31,6 @@
     <packaging>jar</packaging>
 
     <properties>
-        <project.build.sourceJdk>1.6</project.build.sourceJdk>
-        <project.build.targetJdk>1.6</project.build.targetJdk>
         <fb.main.basedir>${project.parent.basedir}</fb.main.basedir>
     </properties>
 

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.nifty.client;
+package com.facebook.nifty.legacy.client;
 
-import com.facebook.nifty.duplex.TDuplexProtocolFactory;
+import com.facebook.nifty.legacy.duplex.TDuplexProtocolFactory;
 import org.apache.thrift.TException;
 import org.jboss.netty.buffer.ChannelBuffer;
 
