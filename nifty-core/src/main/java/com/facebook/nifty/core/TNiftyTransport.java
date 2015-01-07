@@ -29,8 +29,7 @@ public class TNiftyTransport extends TTransport
     private final Channel channel;
     private final ChannelBuffer in;
     private final ThriftTransportType thriftTransportType;
-    private final ChannelBuffer out;
-    private static final int DEFAULT_OUTPUT_BUFFER_SIZE = 1024;
+    private ChannelBuffer out;
     private final int initialReaderIndex;
     private final int initialBufferPosition;
     private int bufferPosition;
@@ -44,7 +43,7 @@ public class TNiftyTransport extends TTransport
         this.channel = channel;
         this.in = in;
         this.thriftTransportType = thriftTransportType;
-        this.out = ChannelBuffers.dynamicBuffer(DEFAULT_OUTPUT_BUFFER_SIZE);
+        this.out = ChannelBuffers.dynamicBuffer(0);
         this.initialReaderIndex = in.readerIndex();
 
         if (!in.hasArray()) {
@@ -67,6 +66,10 @@ public class TNiftyTransport extends TTransport
     public TNiftyTransport(Channel channel, ThriftMessage message)
     {
         this(channel, message.getBuffer(), message.getTransportType());
+    }
+
+    public void reserveOutputBuffer(int size) {
+        this.out = ChannelBuffers.buffer(size);
     }
 
     @Override
