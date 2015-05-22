@@ -35,7 +35,7 @@ public class TNiftyTransport extends TTransport
     private final int initialBufferPosition;
     private int bufferPosition;
     private int bufferEnd;
-    private final byte[] buffer;
+    private byte[] buffer;
 
     public TNiftyTransport(Channel channel,
                            ChannelBuffer in,
@@ -126,6 +126,11 @@ public class TNiftyTransport extends TTransport
         return out;
     }
 
+    public ChannelBuffer getInputBuffer()
+    {
+        return in;
+    }
+
     public ThriftTransportType getTransportType() {
         return thriftTransportType;
     }
@@ -176,5 +181,13 @@ public class TNiftyTransport extends TTransport
     public int getWrittenByteCount()
     {
         return getOutputBuffer().writerIndex();
+    }
+
+    public void reset(byte[] buf) { reset(buf, 0, buf.length); }
+
+    public void reset(byte[] buf, int offset, int length) {
+        buffer = buf;
+        bufferPosition = offset;
+        bufferEnd = offset + length;
     }
 }
