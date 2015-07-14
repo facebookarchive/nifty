@@ -15,6 +15,7 @@
  */
 package com.facebook.nifty.client;
 
+import com.facebook.nifty.client.socks.Socks4ClientBootstrap;
 import com.facebook.nifty.duplex.TDuplexProtocolFactory;
 import com.google.common.net.HostAndPort;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -29,6 +30,7 @@ public abstract class AbstractClientConnector<T extends NiftyClientChannel>
 {
     protected final SocketAddress address;
     private final TDuplexProtocolFactory protocolFactory;
+    private volatile SocketAddress resolvedAddress;
 
     public AbstractClientConnector(SocketAddress address, TDuplexProtocolFactory protocolFactory)
     {
@@ -39,7 +41,14 @@ public abstract class AbstractClientConnector<T extends NiftyClientChannel>
     @Override
     public ChannelFuture connect(ClientBootstrap bootstrap)
     {
-        return bootstrap.connect(address);
+        if (bootstrap instanceof Socks4ClientBootstrap) {
+            return bootstrap.connect(address);
+        }
+
+        if (resolvedAddress == null) {
+            resolvedAddress = resolvedAddress((InetSocketAddress) address);
+        }
+        return bootstrap.connect(resolvedAddress);
     }
 
     @Override
@@ -55,11 +64,19 @@ public abstract class AbstractClientConnector<T extends NiftyClientChannel>
 
     protected static SocketAddress toSocketAddress(HostAndPort address)
     {
-        return new InetSocketAddress(address.getHostText(), address.getPort());
+        return InetSocketAddress.createUnresolved(address.getHostText(), address.getPort());
     }
 
     protected static TDuplexProtocolFactory defaultProtocolFactory()
     {
         return TDuplexProtocolFactory.fromSingleFactory(new TBinaryProtocol.Factory());
+    }
+
+    private static InetSocketAddress resolvedAddress(InetSocketAddress address)
+    {
+        if (!address.isUnresolved()) {
+            return address;
+        }
+        return new InetSocketAddress(address.getHostString(), address.getPort());
     }
 }
