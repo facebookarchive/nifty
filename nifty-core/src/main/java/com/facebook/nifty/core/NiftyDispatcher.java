@@ -140,7 +140,8 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
             // more requests that were in the latest read, even while further reads on the channel
             // have been blocked.
             if (requestSequenceId > lastResponseWrittenId.get() + queuedResponseLimit &&
-                !DispatcherContext.isChannelReadBlocked(ctx))
+                !DispatcherContext.isChannelReadBlocked(ctx) &&
+                DispatcherContext.isResponseOrderingRequired(ctx))
             {
                 DispatcherContext.blockChannelReads(ctx);
             }
