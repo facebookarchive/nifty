@@ -22,6 +22,8 @@ import io.airlift.units.Duration;
 
 import java.util.concurrent.Executor;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Descriptor for a Thrift Server. This defines a listener port that Nifty need to start a Thrift endpoint.
  */
@@ -56,6 +58,10 @@ public class ThriftServerDef
             Executor executor,
             NiftySecurityFactory securityFactory)
     {
+        // Upper two most significant bits are used for testing whether the message
+        // has framing, and whether it is using HTTP transport.
+        checkArgument(maxFrameSize <= 0x3FFFFFFF, "Max frame size must be smaller than 1GB");
+
         this.name = name;
         this.serverPort = serverPort;
         this.maxFrameSize = maxFrameSize;
