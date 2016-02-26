@@ -23,12 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.thrift.TException;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.testng.Assert;
@@ -37,17 +32,18 @@ import org.testng.annotations.Test;
 import com.facebook.nifty.processor.NiftyProcessor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 public class TestConnectionContext extends AbstractLiveTest
 {
-
     @Test
     public void testContextNormal() throws IOException, TException, InterruptedException
     {
         final SynchronousQueue<RequestContext> requestContextQueue = new SynchronousQueue<>();
-        final SynchronousQueue<SettableFuture<Boolean>> sendResponseQueue = new SynchronousQueue<>();
+        final SynchronousQueue<SettableFuture<ListenableFuture<Boolean>>> sendResponseQueue = new SynchronousQueue<>();
         NiftyProcessor processor = mockProcessor(null, null, requestContextQueue, sendResponseQueue);
 
         try (FakeServer server = listen(processor);
@@ -58,9 +54,10 @@ public class TestConnectionContext extends AbstractLiveTest
             RequestContext requestContext = requestContextQueue.poll(30, TimeUnit.SECONDS);
             Preconditions.checkNotNull(requestContext, "Either deadlock, or your computer is really slow");
             ConnectionContext actualContext = requestContext.getConnectionContext();
-            SettableFuture<Boolean> sendResponse = sendResponseQueue.take();
+            SettableFuture<ListenableFuture<Boolean>> sendResponseFuture = sendResponseQueue.take();
 
-            // ConnectionContext should show the request from the client
+            // At this point, the server has called the mock processor's process method.
+            // Values in the ConnectionContext should be right
             Assert.assertNotNull(
                     actualContext.getRemoteAddress(),
                     "remote address non-null");
@@ -68,13 +65,33 @@ public class TestConnectionContext extends AbstractLiveTest
                     ((InetSocketAddress) actualContext.getRemoteAddress()).getPort(),
                     client.getClientPort(),
                     "context has correct port");
+            Assert.assertFalse(
+                    actualContext.hasClientDisconnected(),
+                    "should not report that client has disconnected");
 
-            sendResponse.set(false);
+            // Allow the process method to return a future, but don't fulfill it yet.
+            SettableFuture<Boolean> resp = SettableFuture.create();
+            sendResponseFuture.set(resp);
+
+            // The context should still be right
+            Assert.assertNotNull(
+                actualContext.getRemoteAddress(),
+                "remote address non-null");
+            Assert.assertEquals(
+                    ((InetSocketAddress) actualContext.getRemoteAddress()).getPort(),
+                    client.getClientPort(),
+                    "context has correct port");
+            Assert.assertFalse(
+                    actualContext.hasClientDisconnected(),
+                    "should not report that client has disconnected");
+
+            // Finish
+            resp.set(false);
         }
     }
 
     @Test
-    public void testContextOnClosedConnection() throws IOException, TException, InterruptedException
+    public void testDisconnectBetweenQueueAndProcessing() throws IOException, TException, InterruptedException
     {
         // An ExecutorService which lets us delay calls from NiftyDispatcher to the processor
         final SynchronousQueue<Semaphore> tasksWaitingToRun = new SynchronousQueue<>();
@@ -95,7 +112,7 @@ public class TestConnectionContext extends AbstractLiveTest
         };
 
         final SynchronousQueue<RequestContext> requestContextQueue = new SynchronousQueue<>();
-        final SynchronousQueue<SettableFuture<Boolean>> sendResponseQueue = new SynchronousQueue<>();
+        final SynchronousQueue<SettableFuture<ListenableFuture<Boolean>>> sendResponseQueue = new SynchronousQueue<>();
         NiftyProcessor processor = mockProcessor(null, null, requestContextQueue, sendResponseQueue);
 
         ChannelGroup channels = new DefaultChannelGroup();
@@ -109,28 +126,17 @@ public class TestConnectionContext extends AbstractLiveTest
             Preconditions.checkNotNull(allowNiftyProcessorToRun, "Either deadlock, or your computer is really slow");
 
             // Close the channel. We do the close on the server side because that
-            // lets us control when all the close handlers are run (namely, on
-            // our thread) which in turn lets us wait until the channel has finished
-            // closing.
-            final AtomicReference<Thread> threadThatProcessedClose = new AtomicReference<>();
-            Channel channelToClient = Iterables.getOnlyElement(channels);
-            channelToClient.getCloseFuture().addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    threadThatProcessedClose.set(Thread.currentThread());
-                }
-            });
-            channelToClient.close();
-            Preconditions.checkState(threadThatProcessedClose.get() == Thread.currentThread());
+            // lets us control when all the close handlers are run.
+            closeAndWaitForHandlers(Iterables.getOnlyElement(channels));
 
-            // Now allow the NiftyProcessor to run, and wait for it to finish
+            // Allow nifty to call into the processor, but don't let the processor return
             allowNiftyProcessorToRun.release();
             RequestContext requestContext = requestContextQueue.poll(30, TimeUnit.SECONDS);
             Preconditions.checkNotNull(requestContext, "Either deadlock, or your computer is really slow");
             ConnectionContext actualContext = requestContext.getConnectionContext();
-            SettableFuture<Boolean> sendResponse = sendResponseQueue.take();
+            SettableFuture<ListenableFuture<Boolean>> sendResponse = sendResponseQueue.take();
 
-            // The connection context should still be correct
+            // The connection context should be correct
             Assert.assertNotNull(
                     actualContext.getRemoteAddress(),
                     "remote address non-null");
@@ -138,12 +144,67 @@ public class TestConnectionContext extends AbstractLiveTest
                     ((InetSocketAddress) actualContext.getRemoteAddress()).getPort(),
                     client.getClientPort(),
                     "context has correct port");
+            Assert.assertTrue(
+                    actualContext.hasClientDisconnected(),
+                    "context shows remote client disconnected");
 
-            sendResponse.set(false);
+            // Finish up
+            sendResponse.set(Futures.immediateFuture(false));
         } finally {
             threadpool.shutdown();
         }
     }
 
+    @Test
+    public void testDisconnectWhenProcessing() throws IOException, TException, InterruptedException
+    {
+        final SynchronousQueue<RequestContext> requestContextQueue = new SynchronousQueue<>();
+        final SynchronousQueue<SettableFuture<ListenableFuture<Boolean>>> sendResponseQueue = new SynchronousQueue<>();
+        NiftyProcessor processor = mockProcessor(null, null, requestContextQueue, sendResponseQueue);
 
+        ChannelGroup channels = new DefaultChannelGroup();
+
+        try (FakeServer server = listen(processor, Executors.newCachedThreadPool(), channels);
+             FakeClient client = connect(server)) {
+
+            // Issue a fake request and wait for it to arrive
+            client.sendRequest();
+            RequestContext requestContext = requestContextQueue.poll(30, TimeUnit.SECONDS);
+            Preconditions.checkNotNull(requestContext, "Either deadlock, or your computer is really slow");
+            ConnectionContext actualContext = requestContext.getConnectionContext();
+            SettableFuture<ListenableFuture<Boolean>> sendResponseFuture = sendResponseQueue.take();
+
+            // At this point, the server has called the mock processor's process method.
+            // Values in the ConnectionContext should be right
+            Assert.assertNotNull(
+                    actualContext.getRemoteAddress(),
+                    "remote address non-null");
+            Assert.assertEquals(
+                    ((InetSocketAddress) actualContext.getRemoteAddress()).getPort(),
+                    client.getClientPort(),
+                    "context has correct port");
+            Assert.assertFalse(
+                    actualContext.hasClientDisconnected(),
+                    "should not report that client has disconnected");
+
+            // Close the channel. We do the close on the server side because that
+            // lets us control when all the close handlers are run.
+            closeAndWaitForHandlers(Iterables.getOnlyElement(channels));
+
+            // The connection context should be correct, and pick up on the disconnect
+            Assert.assertNotNull(
+                    actualContext.getRemoteAddress(),
+                    "remote address non-null");
+            Assert.assertEquals(
+                    ((InetSocketAddress) actualContext.getRemoteAddress()).getPort(),
+                    client.getClientPort(),
+                    "context has correct port");
+            Assert.assertTrue(
+                    actualContext.hasClientDisconnected(),
+                    "should report that client has disconnected");
+
+            // Tidy up
+            sendResponseFuture.set(Futures.immediateFuture(false));
+        }
+    }
 }

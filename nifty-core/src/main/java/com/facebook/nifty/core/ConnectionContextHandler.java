@@ -31,4 +31,12 @@ public class ConnectionContextHandler extends SimpleChannelUpstreamHandler
 
         ctx.setAttachment(context);
     }
+
+    @Override
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        super.channelDisconnected(ctx, e);
+
+        NiftyConnectionContext context = (NiftyConnectionContext) ctx.getAttachment();
+        context.setHasClientDisconnected(true);
+    }
 }
