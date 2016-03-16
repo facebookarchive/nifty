@@ -29,6 +29,9 @@ import java.net.InetAddress;
  */
 public class SocksProtocols
 {
+    
+    private SocksProtocols() {}
+    
     public static final int SOCKS_VERSION_4 = 0x04;
     public static final int CONNECT = 0x01;
     public static final int REQUEST_GRANTED = 0x5a;
