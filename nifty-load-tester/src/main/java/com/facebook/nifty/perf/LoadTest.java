@@ -1698,7 +1698,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      noop_args typedOther = (noop_args)other;
+      noop_args typedOther = other;
 
       return 0;
     }
@@ -1944,7 +1944,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      noop_result typedOther = (noop_result)other;
+      noop_result typedOther = other;
 
       return 0;
     }
@@ -2190,7 +2190,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      onewayNoop_args typedOther = (onewayNoop_args)other;
+      onewayNoop_args typedOther = other;
 
       return 0;
     }
@@ -2436,7 +2436,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      asyncNoop_args typedOther = (asyncNoop_args)other;
+      asyncNoop_args typedOther = other;
 
       return 0;
     }
@@ -2682,7 +2682,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      asyncNoop_result typedOther = (asyncNoop_result)other;
+      asyncNoop_result typedOther = other;
 
       return 0;
     }
@@ -2995,7 +2995,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      sleep_args typedOther = (sleep_args)other;
+      sleep_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetMicroseconds()).compareTo(typedOther.isSetMicroseconds());
       if (lastComparison != 0) {
@@ -3280,7 +3280,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      sleep_result typedOther = (sleep_result)other;
+      sleep_result typedOther = other;
 
       return 0;
     }
@@ -3593,7 +3593,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      onewaySleep_args typedOther = (onewaySleep_args)other;
+      onewaySleep_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetMicroseconds()).compareTo(typedOther.isSetMicroseconds());
       if (lastComparison != 0) {
@@ -3945,7 +3945,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      burn_args typedOther = (burn_args)other;
+      burn_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetMicroseconds()).compareTo(typedOther.isSetMicroseconds());
       if (lastComparison != 0) {
@@ -4230,7 +4230,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      burn_result typedOther = (burn_result)other;
+      burn_result typedOther = other;
 
       return 0;
     }
@@ -4543,7 +4543,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      onewayBurn_args typedOther = (onewayBurn_args)other;
+      onewayBurn_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetMicroseconds()).compareTo(typedOther.isSetMicroseconds());
       if (lastComparison != 0) {
@@ -4895,7 +4895,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      badSleep_args typedOther = (badSleep_args)other;
+      badSleep_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetMicroseconds()).compareTo(typedOther.isSetMicroseconds());
       if (lastComparison != 0) {
@@ -5180,7 +5180,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      badSleep_result typedOther = (badSleep_result)other;
+      badSleep_result typedOther = other;
 
       return 0;
     }
@@ -5493,7 +5493,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      badBurn_args typedOther = (badBurn_args)other;
+      badBurn_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetMicroseconds()).compareTo(typedOther.isSetMicroseconds());
       if (lastComparison != 0) {
@@ -5778,7 +5778,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      badBurn_result typedOther = (badBurn_result)other;
+      badBurn_result typedOther = other;
 
       return 0;
     }
@@ -6091,7 +6091,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      throwError_args typedOther = (throwError_args)other;
+      throwError_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetCode()).compareTo(typedOther.isSetCode());
       if (lastComparison != 0) {
@@ -6441,7 +6441,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      throwError_result typedOther = (throwError_result)other;
+      throwError_result typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetError()).compareTo(typedOther.isSetError());
       if (lastComparison != 0) {
@@ -6799,7 +6799,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      throwUnexpected_args typedOther = (throwUnexpected_args)other;
+      throwUnexpected_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetCode()).compareTo(typedOther.isSetCode());
       if (lastComparison != 0) {
@@ -7084,7 +7084,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      throwUnexpected_result typedOther = (throwUnexpected_result)other;
+      throwUnexpected_result typedOther = other;
 
       return 0;
     }
@@ -7397,7 +7397,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      onewayThrow_args typedOther = (onewayThrow_args)other;
+      onewayThrow_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetCode()).compareTo(typedOther.isSetCode());
       if (lastComparison != 0) {
@@ -7663,7 +7663,7 @@ public class LoadTest {
     }
 
     public send_args setData(byte[] data) {
-      setData(data == null ? (ByteBuffer)null : ByteBuffer.wrap(data));
+      setData(data == null ? null : ByteBuffer.wrap(data));
       return this;
     }
 
@@ -7758,7 +7758,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      send_args typedOther = (send_args)other;
+      send_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetData()).compareTo(typedOther.isSetData());
       if (lastComparison != 0) {
@@ -8047,7 +8047,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      send_result typedOther = (send_result)other;
+      send_result typedOther = other;
 
       return 0;
     }
@@ -8274,7 +8274,7 @@ public class LoadTest {
     }
 
     public onewaySend_args setData(byte[] data) {
-      setData(data == null ? (ByteBuffer)null : ByteBuffer.wrap(data));
+      setData(data == null ? null : ByteBuffer.wrap(data));
       return this;
     }
 
@@ -8369,7 +8369,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      onewaySend_args typedOther = (onewaySend_args)other;
+      onewaySend_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetData()).compareTo(typedOther.isSetData());
       if (lastComparison != 0) {
@@ -8725,7 +8725,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      recv_args typedOther = (recv_args)other;
+      recv_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetBytes()).compareTo(typedOther.isSetBytes());
       if (lastComparison != 0) {
@@ -8991,7 +8991,7 @@ public class LoadTest {
     }
 
     public recv_result setSuccess(byte[] success) {
-      setSuccess(success == null ? (ByteBuffer)null : ByteBuffer.wrap(success));
+      setSuccess(success == null ? null : ByteBuffer.wrap(success));
       return this;
     }
 
@@ -9086,7 +9086,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      recv_result typedOther = (recv_result)other;
+      recv_result typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
@@ -9372,7 +9372,7 @@ public class LoadTest {
     }
 
     public sendrecv_args setData(byte[] data) {
-      setData(data == null ? (ByteBuffer)null : ByteBuffer.wrap(data));
+      setData(data == null ? null : ByteBuffer.wrap(data));
       return this;
     }
 
@@ -9512,7 +9512,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      sendrecv_args typedOther = (sendrecv_args)other;
+      sendrecv_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetData()).compareTo(typedOther.isSetData());
       if (lastComparison != 0) {
@@ -9819,7 +9819,7 @@ public class LoadTest {
     }
 
     public sendrecv_result setSuccess(byte[] success) {
-      setSuccess(success == null ? (ByteBuffer)null : ByteBuffer.wrap(success));
+      setSuccess(success == null ? null : ByteBuffer.wrap(success));
       return this;
     }
 
@@ -9914,7 +9914,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      sendrecv_result typedOther = (sendrecv_result)other;
+      sendrecv_result typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
@@ -10184,7 +10184,7 @@ public class LoadTest {
     }
 
     public echo_args setData(byte[] data) {
-      setData(data == null ? (ByteBuffer)null : ByteBuffer.wrap(data));
+      setData(data == null ? null : ByteBuffer.wrap(data));
       return this;
     }
 
@@ -10279,7 +10279,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      echo_args typedOther = (echo_args)other;
+      echo_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetData()).compareTo(typedOther.isSetData());
       if (lastComparison != 0) {
@@ -10549,7 +10549,7 @@ public class LoadTest {
     }
 
     public echo_result setSuccess(byte[] success) {
-      setSuccess(success == null ? (ByteBuffer)null : ByteBuffer.wrap(success));
+      setSuccess(success == null ? null : ByteBuffer.wrap(success));
       return this;
     }
 
@@ -10644,7 +10644,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      echo_result typedOther = (echo_result)other;
+      echo_result typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
@@ -11059,7 +11059,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      add_args typedOther = (add_args)other;
+      add_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetA()).compareTo(typedOther.isSetA());
       if (lastComparison != 0) {
@@ -11446,7 +11446,7 @@ public class LoadTest {
       }
 
       int lastComparison = 0;
-      add_result typedOther = (add_result)other;
+      add_result typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
