@@ -35,7 +35,7 @@ import static java.util.concurrent.Executors.newCachedThreadPool;
  */
 public class NettyClientConfigBuilder extends NettyConfigBuilderBase<NettyClientConfigBuilder>
 {
-    private HostAndPort defaultSocksProxyAddress = null;
+    private HostAndPort defaultSocksProxyAddress;
 
     private final NioSocketChannelConfig socketChannelConfig = (NioSocketChannelConfig) Proxy.newProxyInstance(
             getClass().getClassLoader(),

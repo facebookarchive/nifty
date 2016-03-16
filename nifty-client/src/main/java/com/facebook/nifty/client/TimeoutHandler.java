@@ -28,8 +28,8 @@ public final class TimeoutHandler implements ChannelUpstreamHandler, ChannelDown
 {
     private static final String NAME = "_TIMEOUT_HANDLER";
 
-    private volatile long lastMessageReceivedNanos = 0L;
-    private volatile long  lastMessageSentNanos = 0L;
+    private volatile long lastMessageReceivedNanos;
+    private volatile long  lastMessageSentNanos;
 
     public static synchronized void addToPipeline(ChannelPipeline cp)
     {

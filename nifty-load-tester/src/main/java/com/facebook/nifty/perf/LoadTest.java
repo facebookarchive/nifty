@@ -2862,7 +2862,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __MICROSECONDS_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -3460,7 +3460,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __MICROSECONDS_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -3812,7 +3812,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __MICROSECONDS_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -4410,7 +4410,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __MICROSECONDS_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -4762,7 +4762,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __MICROSECONDS_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -5360,7 +5360,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __MICROSECONDS_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -5958,7 +5958,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __CODE_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -6666,7 +6666,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __CODE_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -7264,7 +7264,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __CODE_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -8592,7 +8592,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __BYTES_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -9314,7 +9314,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __RECVBYTES_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -10873,7 +10873,7 @@ public class LoadTest {
     // isset id assignments
     private static final int __A_ISSET_ID = 0;
     private static final int __B_ISSET_ID = 1;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -11313,7 +11313,7 @@ public class LoadTest {
 
     // isset id assignments
     private static final int __SUCCESS_ISSET_ID = 0;
-    private byte __isset_bitfield = 0;
+    private byte __isset_bitfield;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);

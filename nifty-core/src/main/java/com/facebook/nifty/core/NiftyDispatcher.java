@@ -377,8 +377,8 @@ public class NiftyDispatcher extends SimpleChannelUpstreamHandler
     private static class DispatcherContext
     {
         private ReadBlockedState readBlockedState = ReadBlockedState.NOT_BLOCKED;
-        private boolean responseOrderingRequired = false;
-        private boolean responseOrderingRequirementInitialized = false;
+        private boolean responseOrderingRequired;
+        private boolean responseOrderingRequirementInitialized;
 
         public static boolean isChannelReadBlocked(ChannelHandlerContext ctx) {
             return getDispatcherContext(ctx).readBlockedState == ReadBlockedState.BLOCKED;

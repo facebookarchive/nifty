@@ -116,7 +116,7 @@ public class LoadError extends TException implements org.apache.thrift.TBase<Loa
 
   // isset id assignments
   private static final int __CODE_ISSET_ID = 0;
-  private byte __isset_bitfield = 0;
+  private byte __isset_bitfield;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
