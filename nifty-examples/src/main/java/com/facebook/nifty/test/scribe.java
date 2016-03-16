@@ -154,7 +154,7 @@ public class scribe {
 
   public static class Processor<I extends Iface> extends org.apache.thrift.TBaseProcessor<I> implements org.apache.thrift.TProcessor {
     public Processor(I iface) {
-      super(iface, getProcessMap(new HashMap<String, org.apache.thrift.ProcessFunction<I, ? extends org.apache.thrift.TBase>>()));
+      super(iface, getProcessMap(new HashMap<>()));
     }
 
     protected Processor(I iface, Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
@@ -193,7 +193,7 @@ public class scribe {
 
     private static final org.apache.thrift.protocol.TField MESSAGES_FIELD_DESC = new org.apache.thrift.protocol.TField("messages", org.apache.thrift.protocol.TType.LIST, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new Log_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new Log_argsTupleSchemeFactory());
@@ -205,7 +205,7 @@ public class scribe {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       MESSAGES((short)1, "messages");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -262,7 +262,7 @@ public class scribe {
     // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.MESSAGES, new org.apache.thrift.meta_data.FieldMetaData("messages", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
               new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, LogEntry.class))));
@@ -285,7 +285,7 @@ public class scribe {
      */
     public Log_args(Log_args other) {
       if (other.isSetMessages()) {
-        List<LogEntry> __this__messages = new ArrayList<LogEntry>();
+        List<LogEntry> __this__messages = new ArrayList<>();
         for (LogEntry other_element : other.messages) {
           __this__messages.add(new LogEntry(other_element));
         }
@@ -312,7 +312,7 @@ public class scribe {
 
     public void addToMessages(LogEntry elem) {
       if (this.messages == null) {
-        this.messages = new ArrayList<LogEntry>();
+        this.messages = new ArrayList<>();
       }
       this.messages.add(elem);
     }
@@ -498,7 +498,7 @@ public class scribe {
               if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
                 {
                   org.apache.thrift.protocol.TList _list0 = iprot.readListBegin();
-                  struct.messages = new ArrayList<LogEntry>(_list0.size);
+                  struct.messages = new ArrayList<>(_list0.size);
                   for (int _i1 = 0; _i1 < _list0.size; ++_i1)
                   {
                     LogEntry _elem2; // required
@@ -580,7 +580,7 @@ public class scribe {
         if (incoming.get(0)) {
           {
             org.apache.thrift.protocol.TList _list5 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-            struct.messages = new ArrayList<LogEntry>(_list5.size);
+            struct.messages = new ArrayList<>(_list5.size);
             for (int _i6 = 0; _i6 < _list5.size; ++_i6)
             {
               LogEntry _elem7; // required
@@ -601,7 +601,7 @@ public class scribe {
 
     private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.I32, (short)0);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new Log_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new Log_resultTupleSchemeFactory());
@@ -621,7 +621,7 @@ public class scribe {
        */
       SUCCESS((short)0, "success");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -678,7 +678,7 @@ public class scribe {
     // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, ResultCode.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);

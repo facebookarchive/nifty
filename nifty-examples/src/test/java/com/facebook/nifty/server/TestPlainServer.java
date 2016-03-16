@@ -292,18 +292,17 @@ public class TestPlainServer
 
     private scribe.Processor<scribe.Iface> defaultProcessor()
     {
-        return new scribe.Processor<scribe.Iface>(new scribe.Iface() {
+        return new scribe.Processor<>(new scribe.Iface() {
             @Override
             public ResultCode Log(List<LogEntry> messages)
-                    throws TException
-            {
+                    throws TException {
                 RequestContext context = RequestContexts.getCurrentContext();
 
                 for (LogEntry message : messages) {
                     log.info("[Client: %s] %s: %s",
-                             context.getConnectionContext().getRemoteAddress(),
-                             message.getCategory(),
-                             message.getMessage());
+                            context.getConnectionContext().getRemoteAddress(),
+                            message.getCategory(),
+                            message.getMessage());
                 }
                 return ResultCode.OK;
             }

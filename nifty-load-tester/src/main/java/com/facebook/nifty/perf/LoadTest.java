@@ -1168,7 +1168,7 @@ public class LoadTest {
 
   public static class Processor<I extends Iface> extends org.apache.thrift.TBaseProcessor<I> implements org.apache.thrift.TProcessor {
     public Processor(I iface) {
-      super(iface, getProcessMap(new HashMap<String, org.apache.thrift.ProcessFunction<I, ? extends org.apache.thrift.TBase>>()));
+      super(iface, getProcessMap(new HashMap<>()));
     }
 
     protected Processor(I iface, Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
@@ -1563,7 +1563,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("noop_args");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new noop_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new noop_argsTupleSchemeFactory());
@@ -1574,7 +1574,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -1627,7 +1627,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(noop_args.class, metaDataMap);
     }
@@ -1809,7 +1809,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("noop_result");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new noop_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new noop_resultTupleSchemeFactory());
@@ -1820,7 +1820,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -1873,7 +1873,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(noop_result.class, metaDataMap);
     }
@@ -2055,7 +2055,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("onewayNoop_args");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new onewayNoop_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new onewayNoop_argsTupleSchemeFactory());
@@ -2066,7 +2066,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -2119,7 +2119,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(onewayNoop_args.class, metaDataMap);
     }
@@ -2301,7 +2301,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("asyncNoop_args");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new asyncNoop_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new asyncNoop_argsTupleSchemeFactory());
@@ -2312,7 +2312,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -2365,7 +2365,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(asyncNoop_args.class, metaDataMap);
     }
@@ -2547,7 +2547,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("asyncNoop_result");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new asyncNoop_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new asyncNoop_resultTupleSchemeFactory());
@@ -2558,7 +2558,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -2611,7 +2611,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(asyncNoop_result.class, metaDataMap);
     }
@@ -2794,7 +2794,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField MICROSECONDS_FIELD_DESC = new org.apache.thrift.protocol.TField("microseconds", org.apache.thrift.protocol.TType.I64, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new sleep_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new sleep_argsTupleSchemeFactory());
@@ -2806,7 +2806,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       MICROSECONDS((short)1, "microseconds");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -2865,7 +2865,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.MICROSECONDS, new org.apache.thrift.meta_data.FieldMetaData("microseconds", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -3145,7 +3145,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("sleep_result");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new sleep_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new sleep_resultTupleSchemeFactory());
@@ -3156,7 +3156,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -3209,7 +3209,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(sleep_result.class, metaDataMap);
     }
@@ -3392,7 +3392,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField MICROSECONDS_FIELD_DESC = new org.apache.thrift.protocol.TField("microseconds", org.apache.thrift.protocol.TType.I64, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new onewaySleep_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new onewaySleep_argsTupleSchemeFactory());
@@ -3404,7 +3404,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       MICROSECONDS((short)1, "microseconds");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -3463,7 +3463,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.MICROSECONDS, new org.apache.thrift.meta_data.FieldMetaData("microseconds", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -3744,7 +3744,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField MICROSECONDS_FIELD_DESC = new org.apache.thrift.protocol.TField("microseconds", org.apache.thrift.protocol.TType.I64, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new burn_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new burn_argsTupleSchemeFactory());
@@ -3756,7 +3756,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       MICROSECONDS((short)1, "microseconds");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -3815,7 +3815,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.MICROSECONDS, new org.apache.thrift.meta_data.FieldMetaData("microseconds", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -4095,7 +4095,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("burn_result");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new burn_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new burn_resultTupleSchemeFactory());
@@ -4106,7 +4106,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -4159,7 +4159,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(burn_result.class, metaDataMap);
     }
@@ -4342,7 +4342,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField MICROSECONDS_FIELD_DESC = new org.apache.thrift.protocol.TField("microseconds", org.apache.thrift.protocol.TType.I64, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new onewayBurn_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new onewayBurn_argsTupleSchemeFactory());
@@ -4354,7 +4354,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       MICROSECONDS((short)1, "microseconds");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -4413,7 +4413,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.MICROSECONDS, new org.apache.thrift.meta_data.FieldMetaData("microseconds", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -4694,7 +4694,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField MICROSECONDS_FIELD_DESC = new org.apache.thrift.protocol.TField("microseconds", org.apache.thrift.protocol.TType.I64, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new badSleep_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new badSleep_argsTupleSchemeFactory());
@@ -4706,7 +4706,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       MICROSECONDS((short)1, "microseconds");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -4765,7 +4765,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.MICROSECONDS, new org.apache.thrift.meta_data.FieldMetaData("microseconds", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -5045,7 +5045,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("badSleep_result");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new badSleep_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new badSleep_resultTupleSchemeFactory());
@@ -5056,7 +5056,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -5109,7 +5109,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(badSleep_result.class, metaDataMap);
     }
@@ -5292,7 +5292,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField MICROSECONDS_FIELD_DESC = new org.apache.thrift.protocol.TField("microseconds", org.apache.thrift.protocol.TType.I64, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new badBurn_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new badBurn_argsTupleSchemeFactory());
@@ -5304,7 +5304,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       MICROSECONDS((short)1, "microseconds");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -5363,7 +5363,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.MICROSECONDS, new org.apache.thrift.meta_data.FieldMetaData("microseconds", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -5643,7 +5643,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("badBurn_result");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new badBurn_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new badBurn_resultTupleSchemeFactory());
@@ -5654,7 +5654,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -5707,7 +5707,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(badBurn_result.class, metaDataMap);
     }
@@ -5890,7 +5890,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField CODE_FIELD_DESC = new org.apache.thrift.protocol.TField("code", org.apache.thrift.protocol.TType.I32, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new throwError_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new throwError_argsTupleSchemeFactory());
@@ -5902,7 +5902,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       CODE((short)1, "code");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -5961,7 +5961,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.CODE, new org.apache.thrift.meta_data.FieldMetaData("code", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -6242,7 +6242,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField ERROR_FIELD_DESC = new org.apache.thrift.protocol.TField("error", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new throwError_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new throwError_resultTupleSchemeFactory());
@@ -6254,7 +6254,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       ERROR((short)1, "error");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -6311,7 +6311,7 @@ public class LoadTest {
     // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.ERROR, new org.apache.thrift.meta_data.FieldMetaData("error", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -6598,7 +6598,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField CODE_FIELD_DESC = new org.apache.thrift.protocol.TField("code", org.apache.thrift.protocol.TType.I32, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new throwUnexpected_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new throwUnexpected_argsTupleSchemeFactory());
@@ -6610,7 +6610,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       CODE((short)1, "code");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -6669,7 +6669,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.CODE, new org.apache.thrift.meta_data.FieldMetaData("code", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -6949,7 +6949,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("throwUnexpected_result");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new throwUnexpected_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new throwUnexpected_resultTupleSchemeFactory());
@@ -6960,7 +6960,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -7013,7 +7013,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(throwUnexpected_result.class, metaDataMap);
     }
@@ -7196,7 +7196,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField CODE_FIELD_DESC = new org.apache.thrift.protocol.TField("code", org.apache.thrift.protocol.TType.I32, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new onewayThrow_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new onewayThrow_argsTupleSchemeFactory());
@@ -7208,7 +7208,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       CODE((short)1, "code");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -7267,7 +7267,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.CODE, new org.apache.thrift.meta_data.FieldMetaData("code", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -7548,7 +7548,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField DATA_FIELD_DESC = new org.apache.thrift.protocol.TField("data", org.apache.thrift.protocol.TType.STRING, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new send_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new send_argsTupleSchemeFactory());
@@ -7560,7 +7560,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       DATA((short)1, "data");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -7617,7 +7617,7 @@ public class LoadTest {
     // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.DATA, new org.apache.thrift.meta_data.FieldMetaData("data", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , true)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -7912,7 +7912,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("send_result");
 
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new send_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new send_resultTupleSchemeFactory());
@@ -7923,7 +7923,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
 ;
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -7976,7 +7976,7 @@ public class LoadTest {
     }
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(send_result.class, metaDataMap);
     }
@@ -8159,7 +8159,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField DATA_FIELD_DESC = new org.apache.thrift.protocol.TField("data", org.apache.thrift.protocol.TType.STRING, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new onewaySend_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new onewaySend_argsTupleSchemeFactory());
@@ -8171,7 +8171,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       DATA((short)1, "data");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -8228,7 +8228,7 @@ public class LoadTest {
     // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.DATA, new org.apache.thrift.meta_data.FieldMetaData("data", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , true)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -8524,7 +8524,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField BYTES_FIELD_DESC = new org.apache.thrift.protocol.TField("bytes", org.apache.thrift.protocol.TType.I64, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new recv_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new recv_argsTupleSchemeFactory());
@@ -8536,7 +8536,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       BYTES((short)1, "bytes");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -8595,7 +8595,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.BYTES, new org.apache.thrift.meta_data.FieldMetaData("bytes", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -8876,7 +8876,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new recv_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new recv_resultTupleSchemeFactory());
@@ -8888,7 +8888,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -8945,7 +8945,7 @@ public class LoadTest {
     // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , true)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -9242,7 +9242,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TField DATA_FIELD_DESC = new org.apache.thrift.protocol.TField("data", org.apache.thrift.protocol.TType.STRING, (short)1);
     private static final org.apache.thrift.protocol.TField RECV_BYTES_FIELD_DESC = new org.apache.thrift.protocol.TField("recvBytes", org.apache.thrift.protocol.TType.I64, (short)2);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new sendrecv_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new sendrecv_argsTupleSchemeFactory());
@@ -9256,7 +9256,7 @@ public class LoadTest {
       DATA((short)1, "data"),
       RECV_BYTES((short)2, "recvBytes");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -9317,7 +9317,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.DATA, new org.apache.thrift.meta_data.FieldMetaData("data", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , true)));
       tmpMap.put(_Fields.RECV_BYTES, new org.apache.thrift.meta_data.FieldMetaData("recvBytes", org.apache.thrift.TFieldRequirementType.DEFAULT, 
@@ -9704,7 +9704,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new sendrecv_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new sendrecv_resultTupleSchemeFactory());
@@ -9716,7 +9716,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -9773,7 +9773,7 @@ public class LoadTest {
     // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , true)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -10069,7 +10069,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField DATA_FIELD_DESC = new org.apache.thrift.protocol.TField("data", org.apache.thrift.protocol.TType.STRING, (short)1);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new echo_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new echo_argsTupleSchemeFactory());
@@ -10081,7 +10081,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       DATA((short)1, "data");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -10138,7 +10138,7 @@ public class LoadTest {
     // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.DATA, new org.apache.thrift.meta_data.FieldMetaData("data", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , true)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -10434,7 +10434,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new echo_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new echo_resultTupleSchemeFactory());
@@ -10446,7 +10446,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -10503,7 +10503,7 @@ public class LoadTest {
     // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , true)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -10800,7 +10800,7 @@ public class LoadTest {
     private static final org.apache.thrift.protocol.TField A_FIELD_DESC = new org.apache.thrift.protocol.TField("a", org.apache.thrift.protocol.TType.I64, (short)1);
     private static final org.apache.thrift.protocol.TField B_FIELD_DESC = new org.apache.thrift.protocol.TField("b", org.apache.thrift.protocol.TType.I64, (short)2);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new add_argsStandardSchemeFactory());
       schemes.put(TupleScheme.class, new add_argsTupleSchemeFactory());
@@ -10814,7 +10814,7 @@ public class LoadTest {
       A((short)1, "a"),
       B((short)2, "b");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -10876,7 +10876,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.A, new org.apache.thrift.meta_data.FieldMetaData("a", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
       tmpMap.put(_Fields.B, new org.apache.thrift.meta_data.FieldMetaData("b", org.apache.thrift.TFieldRequirementType.DEFAULT, 
@@ -11245,7 +11245,7 @@ public class LoadTest {
 
     private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.I64, (short)0);
 
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
     static {
       schemes.put(StandardScheme.class, new add_resultStandardSchemeFactory());
       schemes.put(TupleScheme.class, new add_resultTupleSchemeFactory());
@@ -11257,7 +11257,7 @@ public class LoadTest {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -11316,7 +11316,7 @@ public class LoadTest {
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);

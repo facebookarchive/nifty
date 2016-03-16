@@ -52,7 +52,7 @@ class TNiftyAsyncClientTransport extends TTransport
     public TNiftyAsyncClientTransport(Channel channel)
     {
         this.channel = channel;
-        this.writeBuffers = new ConcurrentLinkedQueue<ChannelBuffer>();
+        this.writeBuffers = new ConcurrentLinkedQueue<>();
     }
 
     public void setListener(TNiftyClientListener listener)

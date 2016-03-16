@@ -48,7 +48,7 @@ public class LoadError extends TException implements org.apache.thrift.TBase<Loa
 
   private static final org.apache.thrift.protocol.TField CODE_FIELD_DESC = new org.apache.thrift.protocol.TField("code", org.apache.thrift.protocol.TType.I32, (short)1);
 
-  private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+  private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<>();
   static {
     schemes.put(StandardScheme.class, new LoadErrorStandardSchemeFactory());
     schemes.put(TupleScheme.class, new LoadErrorTupleSchemeFactory());
@@ -60,7 +60,7 @@ public class LoadError extends TException implements org.apache.thrift.TBase<Loa
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     CODE((short)1, "code");
 
-    private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+    private static final Map<String, _Fields> byName = new HashMap<>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
@@ -119,7 +119,7 @@ public class LoadError extends TException implements org.apache.thrift.TBase<Loa
   private byte __isset_bitfield = 0;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
-    Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+    Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
     tmpMap.put(_Fields.CODE, new org.apache.thrift.meta_data.FieldMetaData("code", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
