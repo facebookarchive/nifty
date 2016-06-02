@@ -31,6 +31,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.facebook.nifty.processor.NiftyProcessorAdapters.factoryFromTProcessorFactory;
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -244,11 +245,10 @@ public abstract class ThriftServerDefBuilderBase<T extends ThriftServerDefBuilde
      */
     public ThriftServerDef build()
     {
-        checkState(niftyProcessorFactory != null || thriftProcessorFactory != null,
-                   "Processor not defined!");
-        checkState(niftyProcessorFactory == null || thriftProcessorFactory == null,
-                   "TProcessors will be automatically adapted to NiftyProcessors, don't specify both");
-        checkState(maxConnections >= 0, "maxConnections should be 0 (for unlimited) or positive");
+        checkArgument(niftyProcessorFactory != null || thriftProcessorFactory != null,
+                      "Processor not defined!");
+        checkArgument(niftyProcessorFactory == null || thriftProcessorFactory == null,
+                      "TProcessors will be automatically adapted to NiftyProcessors, don't specify both");
 
         if (niftyProcessorFactory == null)
         {

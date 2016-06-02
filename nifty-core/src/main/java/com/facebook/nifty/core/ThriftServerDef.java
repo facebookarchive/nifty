@@ -23,6 +23,7 @@ import io.airlift.units.Duration;
 import java.util.concurrent.Executor;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Descriptor for a Thrift Server. This defines a listener port that Nifty need to start a Thrift endpoint.
@@ -58,9 +59,23 @@ public class ThriftServerDef
             Executor executor,
             NiftySecurityFactory securityFactory)
     {
+        checkArgument(processorFactory != null,
+                      "processorFactory may not be null");
+        checkArgument(duplexProtocolFactory != null,
+                      "duplexProtocolFactory may not be null");
+        checkArgument(thriftFrameCodecFactory != null,
+                      "thriftFrameCodecFactory may not be null");
+        checkArgument(executor != null,
+                      "executor may not be null");
+        checkArgument(maxConnections >= 0,
+                      "maxConnections should either be positive or zero (for unlimited)");
+        checkArgument(queuedResponseLimit >= 0,
+                      "Queued response limit should either be positive or zero (for unlimited)");
+
         // Upper two most significant bits are used for testing whether the message
         // has framing, and whether it is using HTTP transport.
         checkArgument(maxFrameSize <= 0x3FFFFFFF, "Max frame size must be smaller than 1GB");
+        checkArgument(maxFrameSize >= 0, "Max frame size may not be negative");
 
         this.name = name;
         this.serverPort = serverPort;
