@@ -56,13 +56,13 @@ public abstract class AbstractClientChannel extends SimpleChannelHandler impleme
     private static final Logger LOGGER = Logger.get(AbstractClientChannel.class);
 
     private final Channel nettyChannel;
-    private Duration sendTimeout = null;
+    private Duration sendTimeout;
 
     // Timeout until the whole request must be received.
-    private Duration receiveTimeout = null;
+    private Duration receiveTimeout;
 
     // Timeout for not receiving any data from the server
-    private Duration readTimeout = null;
+    private Duration readTimeout;
 
     private final Map<Integer, Request> requestMap = new HashMap<>();
     private volatile TException channelError;

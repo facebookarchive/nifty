@@ -23,8 +23,8 @@ import org.jboss.netty.channel.DefaultChannelFuture;
  */
 public class SettableChannelFuture extends DefaultChannelFuture
 {
-    private Channel settableChannel = null;
-    private boolean channelIsSet = false;
+    private Channel settableChannel;
+    private boolean channelIsSet;
 
     public SettableChannelFuture()
     {

@@ -106,7 +106,7 @@ public class NiftyLoadTester
     {
         private int serverPort = 1234;
         private int maxFrameSize = 1048576;
-        private boolean useTaskQueue = false;
+        private boolean useTaskQueue;
         private int numTaskThreads = 8;
         private int queuedResponseLimit = 500;
         private int acceptBacklog = 1024;

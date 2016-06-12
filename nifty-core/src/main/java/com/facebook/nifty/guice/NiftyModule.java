@@ -30,7 +30,7 @@ import javax.inject.Singleton;
 
 public abstract class NiftyModule extends AbstractModule
 {
-    private boolean configBound = false;
+    private boolean configBound;
 
     @Override
     protected void configure()
