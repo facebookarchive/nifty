@@ -6,7 +6,7 @@ It is also the implementation used by [Swift](https://github.com/facebook/swift)
 
 # Examples
 
-To create a basic Thrift server using Nifty, use the [Thrift 0.9.0](https://dist.apache.org/repos/dist/release/thrift/0.9.0/thrift-0.9.0.tar.gz) code generator to generate Java stub code, write a Handler for your service interface, and pass it to Nifty like this:
+To create a basic Thrift server using Nifty, use the [Thrift 0.9.3](https://dist.apache.org/repos/dist/release/thrift/0.9.3/thrift-0.9.3.tar.gz) code generator to generate Java stub code, write a Handler for your service interface, and pass it to Nifty like this:
 
     public void startServer() {
         // Create the handler
