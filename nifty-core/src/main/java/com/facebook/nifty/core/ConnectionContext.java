@@ -29,6 +29,13 @@ public interface ConnectionContext
     public SocketAddress getRemoteAddress();
 
     /**
+     * Checks whether the client has disconnected.
+     *
+     * @return {@code true} if the client has disconnected
+     */
+    public boolean hasClientDisconnected();
+
+    /**
      * Gets the value of an additional attribute specific to the connection
      *
      * @param attributeName Name of attribute

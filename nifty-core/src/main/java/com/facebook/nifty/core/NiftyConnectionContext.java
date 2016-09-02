@@ -27,6 +27,7 @@ public class NiftyConnectionContext implements ConnectionContext
 {
     private SocketAddress remoteAddress;
     private Map<String, Object> attributes = new ConcurrentHashMap<>();
+    private volatile boolean disconnected = false;
 
     @Override
     public SocketAddress getRemoteAddress()
@@ -37,6 +38,17 @@ public class NiftyConnectionContext implements ConnectionContext
     public void setRemoteAddress(SocketAddress remoteAddress)
     {
         this.remoteAddress = remoteAddress;
+    }
+
+    @Override
+    public boolean hasClientDisconnected()
+    {
+        return disconnected;
+    }
+
+    public void setHasClientDisconnected(boolean disconnected)
+    {
+        this.disconnected = disconnected;
     }
 
     @Override

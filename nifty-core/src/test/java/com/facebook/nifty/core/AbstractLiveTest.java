@@ -19,8 +19,11 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,10 +35,16 @@ import org.apache.thrift.protocol.TMessageType;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TStruct;
 import org.apache.thrift.transport.TIOStreamTransport;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelStateEvent;
+import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 
 import com.facebook.nifty.processor.NiftyProcessor;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -60,11 +69,48 @@ public class AbstractLiveTest
         return new FakeClient(server);
     }
 
+    /**
+     * Makes a NiftyProcessor which can be controlled from another thread.
+     * The intent is that a test case can make a mock NiftyProcessor using this
+     * method and pass it to a FakeServer. The test case can then use the features
+     * of the mock processor to control precisely when various steps of the
+     * server-side processing happens, and make assertions when it needs to.
+     *
+     * Whenever a call reaches the mock processor, the processor first passes
+     * the arguments to the test case by adding them to the end of queues. Then,
+     * it passes the test case a {@code SettableFuture} to control how it will
+     * return to nifty. The test case is responsible for inspecting the arguments
+     * as it wants, and eventually fulfilling the {@code SettableFuture} thereby
+     * causing the processor to return to nifty. (Note: the mock processor creates
+     * the SettableFuture and waits on it; the test case uses the "settable" part.
+     * This is different from most applications of SettableFuture, where the
+     * SettableFuture's creator plans to set it and the other party waits.)
+     * If the test case fulfills the SettableFuture with a value, the mock processor
+     * will return that value to nifty; since the value is itself a Future, the
+     * test case is responsible for fulfilling it too. If the test case fulfills
+     * the SettableFuture with an exception, the mock processor will throw that
+     * exception verbatim.
+     *
+     * @param inQueue
+     *          an optional queue, in which the mock processor will put the
+     *          input TProtocol arguments of any calls it gets
+     * @param outQueue
+     *          an optional queue, in which the mock processor will put the
+     *          output TProtocol argument of any calls it gets
+     * @param requestContextQueue
+     *          an optional queue, in which the mock processor will put the
+     *          RequestContext argument of any calls it gets
+     * @param pendingResponsesQueue
+     *          a queue in which the mock processor will place a SettableFuture
+     *          for every call it gets, which the mock processor's creator is
+     *          responsible for fulfilling
+     * @return the new mock processor
+     */
     protected NiftyProcessor mockProcessor(
             @Nullable final BlockingQueue<TProtocol> inQueue,
             @Nullable final BlockingQueue<TProtocol> outQueue,
             @Nullable final BlockingQueue<RequestContext> requestContextQueue,
-            @Nonnull final BlockingQueue<SettableFuture<Boolean>> responseQueue
+            @Nonnull final BlockingQueue<SettableFuture<ListenableFuture<Boolean>>> pendingResponsesQueue
     ) {
         return new NiftyProcessor() {
             @Override
@@ -79,9 +125,21 @@ public class AbstractLiveTest
                 if (requestContextQueue != null) {
                     Uninterruptibles.putUninterruptibly(requestContextQueue, requestContext);
                 }
-                SettableFuture<Boolean> resp = SettableFuture.create();
-                Uninterruptibles.putUninterruptibly(responseQueue, resp);
-                return resp;
+                SettableFuture<ListenableFuture<Boolean>> respFutureFuture = SettableFuture.create();
+                Uninterruptibles.putUninterruptibly(pendingResponsesQueue, respFutureFuture);
+                try {
+                  return Uninterruptibles.getUninterruptibly(respFutureFuture);
+                } catch (CancellationException e) {
+                  throw Throwables.propagate(e);
+                } catch (ExecutionException e) {
+                  // Sneaky throw exactly what was in e.
+                  class SneakyThrow<T extends Throwable> {
+                    @SuppressWarnings("unchecked")
+                    public void thro(Object t) throws T { throw (T) t; }
+                  }
+                  new SneakyThrow<RuntimeException>().thro(e.getCause());
+                  throw new AssertionError("not reached");
+                }
             }
         };
     }
@@ -142,5 +200,42 @@ public class AbstractLiveTest
             socketToServer.close();
             socketToServer = null;
         }
+    }
+
+    protected static void closeAndWaitForHandlers(Channel channel) {
+        // Unfortunately, netty doesn't give us a way to actually wait for handlers.
+        // The best way can do is to trigger the close on the IO thread, and confirm
+        // that it runs them on the same thread.
+
+        AtomicReference<Thread> disconnectedThread = new AtomicReference<Thread>();
+        AtomicReference<Thread> closedThread = new AtomicReference<Thread>();
+        AtomicReference<Thread> ioThread = new AtomicReference<Thread>();
+
+        channel.getPipeline().addFirst(
+            "tests are hard",
+            new SimpleChannelUpstreamHandler() {
+                @Override
+                public void channelDisconnected(ChannelHandlerContext ctx,
+                        ChannelStateEvent e) throws Exception {
+                    super.channelDisconnected(ctx, e);
+                    disconnectedThread.set(Thread.currentThread());
+                }
+
+                @Override
+                public void channelClosed(ChannelHandlerContext ctx,
+                        ChannelStateEvent e) throws Exception {
+                    super.channelClosed(ctx, e);
+                    closedThread.set(Thread.currentThread());
+                }
+            }
+        );
+
+        channel.getPipeline().execute(() -> {
+            channel.close();
+            ioThread.set(Thread.currentThread());
+        }).syncUninterruptibly();
+
+        Preconditions.checkState(ioThread.get() == closedThread.get());
+        Preconditions.checkState(ioThread.get() == disconnectedThread.get());
     }
 }
