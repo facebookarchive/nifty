@@ -132,6 +132,7 @@ public class OpenSslServerConfiguration extends SslServerConfiguration {
                 sessionContext(new String(openSslConfig.sessionContext));
                 sessionTimeoutSeconds(openSslConfig.sessionTimeoutSeconds);
                 sessionCacheSize(openSslConfig.sessionCacheSize);
+                enableStatefulSessionCache(openSslConfig.enableStatefulSessionCache);
                 sslVersion(openSslConfig.sslVersion);
                 nextProtocols(openSslConfig.nextProtocols);
                 clientCAFile(openSslConfig.clientCAFile);
