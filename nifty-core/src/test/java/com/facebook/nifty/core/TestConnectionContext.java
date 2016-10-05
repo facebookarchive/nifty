@@ -17,12 +17,7 @@ package com.facebook.nifty.core;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.thrift.TException;
@@ -112,16 +107,29 @@ public class TestConnectionContext extends AbstractLiveTest
             // lets us control when all the close handlers are run (namely, on
             // our thread) which in turn lets us wait until the channel has finished
             // closing.
+            CountDownLatch latch = new CountDownLatch(2);
             final AtomicReference<Thread> threadThatProcessedClose = new AtomicReference<>();
             Channel channelToClient = Iterables.getOnlyElement(channels);
             channelToClient.getCloseFuture().addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     threadThatProcessedClose.set(Thread.currentThread());
+                    latch.countDown();
                 }
             });
             channelToClient.close();
-            Preconditions.checkState(threadThatProcessedClose.get() == Thread.currentThread());
+
+            final Thread[] expectedThread = new Thread[1];
+            channelToClient.getPipeline().execute(new Runnable() {
+                @Override
+                public void run() {
+                    expectedThread[0] = Thread.currentThread();
+                    latch.countDown();
+                }
+            });
+            latch.await();
+            // Check that we got a callback for close on the io thread.
+            Preconditions.checkState(threadThatProcessedClose.get() == expectedThread[0]);
 
             // Now allow the NiftyProcessor to run, and wait for it to finish
             allowNiftyProcessorToRun.release();

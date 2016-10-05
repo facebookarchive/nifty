@@ -110,6 +110,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
                 cp.addLast("connectionLimiter", connectionLimiter);
                 cp.addLast(ChannelStatistics.NAME, channelStatistics);
                 cp.addLast("encryptionHandler", securityHandlers.getEncryptionHandler());
+                cp.addLast("ioDispatcher", new NiftyIODispatcher());
                 cp.addLast("frameCodec", def.getThriftFrameCodecFactory().create(def.getMaxFrameSize(),
                                                                                  inputProtocolFactory));
                 if (def.getClientIdleTimeout() != null) {
