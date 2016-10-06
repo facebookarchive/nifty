@@ -51,7 +51,7 @@ public final class NiftyOpenSslServerContext implements SslHandlerFactory {
 
     private final OpenSslServerConfiguration sslServerConfiguration;
 
-    private final SslBufferPool bufferPool = newBufferPool();
+    private final SslBufferPool bufferPool;
 
     /**
      * The OpenSSL SSL_CTX object
@@ -96,6 +96,15 @@ public final class NiftyOpenSslServerContext implements SslHandlerFactory {
 
         // Allocate a new APR pool.
         aprPool = Pool.create(0);
+
+        int maxSslBufferBytes = sslServerConfiguration.maxSslBufferBytes;
+        boolean preallocateSslBuffer = sslServerConfiguration.preallocateSslBuffer;
+        boolean threadLocalSslBuffer = sslServerConfiguration.threadLocalSslBuffer;
+        if (threadLocalSslBuffer) {
+            bufferPool = new ThreadLocalSslBufferPool(maxSslBufferBytes, preallocateSslBuffer, true);
+        } else {
+            bufferPool = new SslBufferPool(maxSslBufferBytes, preallocateSslBuffer, true);
+        }
 
         // Create a new SSL_CTX and configure it.
         boolean success = false;
@@ -226,10 +235,6 @@ public final class NiftyOpenSslServerContext implements SslHandlerFactory {
                 destroyPools();
             }
         }
-    }
-
-    private static SslBufferPool newBufferPool() {
-        return new SslBufferPool(true, true);
     }
 
     public List<String> cipherSuites() {

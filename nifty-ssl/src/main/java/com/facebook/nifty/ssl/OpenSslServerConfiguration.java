@@ -62,6 +62,9 @@ public class OpenSslServerConfiguration extends SslServerConfiguration {
         public long sessionTimeoutSeconds = 86400;
         public long sessionCacheSize = 0;
         public boolean enableStatefulSessionCache = true;
+        public int maxSslBufferBytes = 19267584;
+        public boolean preallocateSslBuffer = true;
+        public boolean threadLocalSslBuffer = false;
         public SSLVersion sslVersion = SSLVersion.TLS1_2;
         public Iterable<String> nextProtocols = ImmutableList.of("thrift");
         public File clientCAFile;
@@ -118,6 +121,21 @@ public class OpenSslServerConfiguration extends SslServerConfiguration {
             return this;
         }
 
+        public Builder maxSslBufferBytes(int maxSslBufferBytes) {
+            this.maxSslBufferBytes = maxSslBufferBytes;
+            return this;
+        }
+
+        public Builder preallocateSslBuffer(boolean preallocateSslBuffer) {
+            this.preallocateSslBuffer = preallocateSslBuffer;
+            return this;
+        }
+
+        public Builder threadLocalSslBuffer(boolean threadLocalSslBuffer) {
+            this.threadLocalSslBuffer = threadLocalSslBuffer;
+            return this;
+        }
+
         /**
          * Copies the state of an existing configration into this builder.
          * @param config the SSL configuration.
@@ -133,6 +151,9 @@ public class OpenSslServerConfiguration extends SslServerConfiguration {
                 sessionTimeoutSeconds(openSslConfig.sessionTimeoutSeconds);
                 sessionCacheSize(openSslConfig.sessionCacheSize);
                 enableStatefulSessionCache(openSslConfig.enableStatefulSessionCache);
+                maxSslBufferBytes(openSslConfig.maxSslBufferBytes);
+                preallocateSslBuffer(openSslConfig.preallocateSslBuffer);
+                threadLocalSslBuffer(openSslConfig.threadLocalSslBuffer);
                 sslVersion(openSslConfig.sslVersion);
                 nextProtocols(openSslConfig.nextProtocols);
                 clientCAFile(openSslConfig.clientCAFile);
@@ -167,6 +188,9 @@ public class OpenSslServerConfiguration extends SslServerConfiguration {
     public final long sessionTimeoutSeconds;
     public final long sessionCacheSize;
     public final boolean enableStatefulSessionCache;
+    public final int maxSslBufferBytes;
+    public final boolean preallocateSslBuffer;
+    public final boolean threadLocalSslBuffer;
     public final SSLVersion sslVersion;
     public final Iterable<String> nextProtocols;
     public final File clientCAFile;
@@ -179,6 +203,9 @@ public class OpenSslServerConfiguration extends SslServerConfiguration {
         this.sessionTimeoutSeconds = builder.sessionTimeoutSeconds;
         this.sessionCacheSize = builder.sessionCacheSize;
         this.enableStatefulSessionCache = builder.enableStatefulSessionCache;
+        this.maxSslBufferBytes = builder.maxSslBufferBytes;
+        this.preallocateSslBuffer = builder.preallocateSslBuffer;
+        this.threadLocalSslBuffer = builder.threadLocalSslBuffer;
         this.sslVersion = builder.sslVersion;
         this.nextProtocols = builder.nextProtocols;
         this.clientCAFile = builder.clientCAFile;

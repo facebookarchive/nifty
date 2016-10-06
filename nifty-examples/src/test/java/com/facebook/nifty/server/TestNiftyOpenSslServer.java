@@ -618,6 +618,24 @@ public class TestNiftyOpenSslServer
         Assert.assertEquals(client2.Log(Arrays.asList(new LogEntry("client2", "aaa"))), ResultCode.OK);
     }
 
+    @Test
+    public void testThreadLocalSslBufferPool() throws InterruptedException, IOException, TException {
+        SslServerConfiguration serverConfig = OpenSslServerConfiguration.newBuilder()
+                .certFile(getServerCertFile())
+                .keyFile(getPrivateKeyFile())
+                .allowPlaintext(false)
+                .sslVerification(OpenSslServerConfiguration.SSLVerification.VERIFY_REQUIRE)
+                .clientCAFile(getClientCertFile())
+                .threadLocalSslBuffer(true)
+                .build();
+
+        ThriftServerDefBuilder builder = getThriftServerDefBuilder(serverConfig, null);
+        startServer(builder);
+
+        scribe.Client client = makeNiftyClient(getClientSSLConfiguration(null, getClientKeyManagers()));
+        Assert.assertEquals(client.Log(Arrays.asList(new LogEntry("client", "aaa"))), ResultCode.OK);
+    }
+
     @Test(expectedExceptions = TTransportException.class)
     public void testClientWithoutCerts() throws InterruptedException, IOException, TException {
         SslServerConfiguration serverConfig = OpenSslServerConfiguration.newBuilder()
