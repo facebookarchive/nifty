@@ -21,6 +21,9 @@ import com.google.common.base.Preconditions;
 
 public class ConnectionContexts
 {
+    
+    private ConnectionContexts() {}
+    
     public static ConnectionContext getContext(Channel channel)
     {
         ConnectionContext context = (ConnectionContext)

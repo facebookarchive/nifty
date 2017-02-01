@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ShutdownUtil
 {
+    private ShutdownUtil() {}
+    
     private static final Logger log = Logger.get(ShutdownUtil.class);
 
     public static void shutdownChannelFactory(ChannelFactory channelFactory,
