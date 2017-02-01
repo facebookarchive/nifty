@@ -130,7 +130,7 @@ public class NettyTcNativeLoader {
         }
         finally {
             // Restore the fields to their original values
-            if (exceptionField != null && modifiersField != null & setModifiers) {
+            if (exceptionField != null && modifiersField != null && setModifiers) {
                 try {
                     modifiersField.setInt(exceptionField, originalModifiers);
                 }
