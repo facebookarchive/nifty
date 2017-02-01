@@ -249,7 +249,7 @@ public class LoadError extends TException implements org.apache.thrift.TBase<Loa
     }
 
     int lastComparison = 0;
-    LoadError typedOther = (LoadError)other;
+    LoadError typedOther = other;
 
     lastComparison = Boolean.valueOf(isSetCode()).compareTo(typedOther.isSetCode());
     if (lastComparison != 0) {

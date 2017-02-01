@@ -412,7 +412,7 @@ public class scribe {
       }
 
       int lastComparison = 0;
-      Log_args typedOther = (Log_args)other;
+      Log_args typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetMessages()).compareTo(typedOther.isSetMessages());
       if (lastComparison != 0) {
@@ -816,7 +816,7 @@ public class scribe {
       }
 
       int lastComparison = 0;
-      Log_result typedOther = (Log_result)other;
+      Log_result typedOther = other;
 
       lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {

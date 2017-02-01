@@ -306,7 +306,7 @@ public class LogEntry implements org.apache.thrift.TBase<LogEntry, LogEntry._Fie
     }
 
     int lastComparison = 0;
-    LogEntry typedOther = (LogEntry)other;
+    LogEntry typedOther = other;
 
     lastComparison = Boolean.valueOf(isSetCategory()).compareTo(typedOther.isSetCategory());
     if (lastComparison != 0) {
