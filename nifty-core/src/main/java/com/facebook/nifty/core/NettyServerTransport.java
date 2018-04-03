@@ -38,11 +38,10 @@ import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.util.ExternalResourceReleasable;
 import org.jboss.netty.util.ThreadNameDeterminer;
 
-import com.google.common.base.Preconditions;
-
 import javax.inject.Inject;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -56,8 +55,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
 {
     private static final Logger log = Logger.get(NettyServerTransport.class);
 
-    private final int requestedPort;
-    private int actualPort;
+    private final int port;
     private final ChannelPipelineFactory pipelineFactory;
     private static final int NO_WRITER_IDLE_TIMEOUT = 0;
     private static final int NO_ALL_IDLE_TIMEOUT = 0;
@@ -84,7 +82,7 @@ public class NettyServerTransport implements ExternalResourceReleasable
     {
         this.def = def;
         this.nettyServerConfig = nettyServerConfig;
-        this.requestedPort = def.getServerPort();
+        this.port = def.getServerPort();
         this.allChannels = allChannels;
         // connectionLimiter must be instantiated exactly once (and thus outside the pipeline factory)
         final ConnectionLimiter connectionLimiter = new ConnectionLimiter(def.getMaxConnections());
@@ -141,18 +139,22 @@ public class NettyServerTransport implements ExternalResourceReleasable
         bootstrap = new ServerBootstrap(serverChannelFactory);
         bootstrap.setOptions(nettyServerConfig.getBootstrapOptions());
         bootstrap.setPipelineFactory(pipelineFactory);
-        serverChannel = bootstrap.bind(new InetSocketAddress(requestedPort));
-        InetSocketAddress actualSocket = (InetSocketAddress) serverChannel.getLocalAddress();
-        actualPort = actualSocket.getPort();
-        Preconditions.checkState(actualPort != 0 && (actualPort == requestedPort || requestedPort == 0));
-        log.info("started transport %s:%s", def.getName(), actualPort);
+        serverChannel = bootstrap.bind(new InetSocketAddress(port));
+        SocketAddress actualSocket = serverChannel.getLocalAddress();
+        if (actualSocket instanceof InetSocketAddress) {
+            int actualPort = ((InetSocketAddress) actualSocket).getPort();
+            log.info("started transport %s:%s (:%s)", def.getName(), actualPort, port);
+        }
+        else {
+            log.info("started transport %s:%s", def.getName(), port);
+        }
     }
 
     public void stop()
             throws InterruptedException
     {
         if (serverChannel != null) {
-            log.info("stopping transport %s:%s", def.getName(), actualPort);
+            log.info("stopping transport %s:%s", def.getName(), port);
             // first stop accepting
             final CountDownLatch latch = new CountDownLatch(1);
             serverChannel.close().addListener(new ChannelFutureListener()
@@ -187,15 +189,6 @@ public class NettyServerTransport implements ExternalResourceReleasable
     public Channel getServerChannel()
     {
         return serverChannel;
-    }
-
-    public int getPort()
-    {
-        if (actualPort != 0) {
-            return actualPort;
-        } else {
-            return requestedPort; // may be 0 if server not yet started
-        }
     }
 
     @Override

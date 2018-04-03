@@ -26,9 +26,10 @@ public class ConnectionContextHandler extends SimpleChannelUpstreamHandler
     {
         super.channelConnected(ctx, e);
 
-        NiftyConnectionContext context = new NiftyConnectionContext();
-        context.setRemoteAddress(ctx.getChannel().getRemoteAddress());
-
-        ctx.setAttachment(context);
+        ConnectionContext connectionContext = ConnectionContexts.getContext(ctx.getChannel());
+        if (connectionContext instanceof NiftyConnectionContext) {
+            NiftyConnectionContext niftyConnectionContext = (NiftyConnectionContext)connectionContext;
+            niftyConnectionContext.setRemoteAddress(ctx.getChannel().getRemoteAddress());
+        }
     }
 }
