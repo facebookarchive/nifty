@@ -371,7 +371,7 @@ public class NiftyClient implements Closeable
 
     private static InetSocketAddress toInetAddress(HostAndPort hostAndPort)
     {
-        return (hostAndPort == null) ? null : new InetSocketAddress(hostAndPort.getHostText(), hostAndPort.getPort());
+        return (hostAndPort == null) ? null : new InetSocketAddress(hostAndPort.getHost(), hostAndPort.getPort());
     }
 
     private class TNiftyFuture<T extends NiftyClientChannel> extends AbstractFuture<T>

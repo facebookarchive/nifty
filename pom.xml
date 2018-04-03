@@ -43,6 +43,7 @@
         <air.check.skip-jacoco>true</air.check.skip-jacoco>
 
         <dep.airlift.version>0.106</dep.airlift.version>
+        <dep.guava.version>24.1-jre</dep.guava.version>
     </properties>
 
     <url>https://facebook.github.com/nifty</url>
@@ -144,6 +145,18 @@
                 <groupId>io.airlift</groupId>
                 <artifactId>log</artifactId>
                 <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${dep.guava.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>jsr305</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

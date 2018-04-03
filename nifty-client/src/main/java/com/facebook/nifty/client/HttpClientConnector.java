@@ -49,7 +49,7 @@ public class HttpClientConnector extends AbstractClientConnector<HttpClientChann
     public HttpClientConnector(String hostNameAndPort, String servicePath, TDuplexProtocolFactory protocolFactory)
             throws URISyntaxException
     {
-        super(new InetSocketAddress(HostAndPort.fromString(hostNameAndPort).getHostText(),
+        super(new InetSocketAddress(HostAndPort.fromString(hostNameAndPort).getHost(),
                                     HostAndPort.fromString(hostNameAndPort).getPortOrDefault(80)),
               protocolFactory);
 
