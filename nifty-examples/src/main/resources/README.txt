@@ -1,3 +1,10 @@
+# Project Status: 🚨 Unmaintained 🚨
+
+This project is archived and no longer maintained. At the time of archiving,
+open issues and pull requests were closed and tagged with `2018-05-archive`.
+For pre-existing users who need an open source alternative, we recommend taking
+a look at [airlift/drift](https://github.com/airlift/drift).
+
 The test certificate files were created with the openssl command line. They are self-signed certificates.
 The procedure to re-create them (if it's ever needed) goes something like this:
 
